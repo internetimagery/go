@@ -19,11 +19,8 @@ pad = (str, val, len)->
   return str
 
 # Get our query to parse
-get_url_parts = ()->
-  url = window.location.href # Get current URL
-  elem = document.createElement("a") # Create temporary element
-  elem.href = url # Apply url for built in parsing
-  elem.hash.substring(1, elem.hash.length).split("-")
+URL = document.createElement("a") # Create temporary element
+URL.href = window.location.href # Apply url for built in parsing
 
 # Convert binary to nested board
 binary_to_board = (binary, size)->
@@ -45,7 +42,7 @@ binary_to_board = (binary, size)->
 
 # Get the current game state
 get_game_state = ()->
-  parts = get_url_parts()
+  parts = URL.hash.substring(1, URL.hash.length).split("-")
   if parts.length == 3 # Check we have all the parts we need
     size = parseInt(parts[0]) # Row count (or column count. Square!)
     turn = parseInt(parts[1]) # Number of turns
@@ -64,20 +61,24 @@ get_game_state = ()->
         else
           last.push(chunk)
 
-      binary_to_board(current, size)
       state =
         size: size # Size of board
         turn_number: turn # How many turns have passed
         player: turn % 2 # Current player : 0 = white, 1 = black
-        current: Array() # Current board state
-        last: Array() # Last board state
-
-
+        current: binary_to_board(current, size) # Current board state
+        last: binary_to_board(last, size) # Last board state
       return state
 
   throw "Invalid URL and Game State"
 
-console.log get_game_state()
+# Convert current game state to URL
+set_game_state = (state)->
+  console.log URL
+
+
+state = get_game_state()
+console.log state
+set_game_state(state)
 #
 #
 #

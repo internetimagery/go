@@ -1,5 +1,5 @@
 (function() {
-  var binary_to_board, get_game_state, get_url_parts, pad;
+  var URL, binary_to_board, get_game_state, pad, set_game_state, state;
 
   pad = function(str, val, len) {
     while (str.length < len) {
@@ -8,13 +8,9 @@
     return str;
   };
 
-  get_url_parts = function() {
-    var elem, url;
-    url = window.location.href;
-    elem = document.createElement("a");
-    elem.href = url;
-    return elem.hash.substring(1, elem.hash.length).split("-");
-  };
+  URL = document.createElement("a");
+
+  URL.href = window.location.href;
 
   binary_to_board = function(binary, size) {
     var board, chunk, row, _i, _len;
@@ -43,7 +39,7 @@
 
   get_game_state = function() {
     var a, b, cell_num, chunk, current, last, parts, size, state, state_id, state_pos, turn, _i, _ref;
-    parts = get_url_parts();
+    parts = URL.hash.substring(1, URL.hash.length).split("-");
     if (parts.length === 3) {
       size = parseInt(parts[0]);
       turn = parseInt(parts[1]);
@@ -62,13 +58,12 @@
             last.push(chunk);
           }
         }
-        binary_to_board(current, size);
         state = {
           size: size,
           turn_number: turn,
           player: turn % 2,
-          current: Array(),
-          last: Array()
+          current: binary_to_board(current, size),
+          last: binary_to_board(last, size)
         };
         return state;
       }
@@ -76,6 +71,14 @@
     throw "Invalid URL and Game State";
   };
 
-  console.log(get_game_state());
+  set_game_state = function(state) {
+    return console.log(URL);
+  };
+
+  state = get_game_state();
+
+  console.log(state);
+
+  set_game_state(state);
 
 }).call(this);
