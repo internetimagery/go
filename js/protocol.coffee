@@ -25,29 +25,54 @@ get_url_parts = ()->
   elem.href = url # Apply url for built in parsing
   elem.hash.substring(1, elem.hash.length).split("-")
 
+# Convert binary to nested board
+binary_to_board = (binary, size)->
+  board = Array()
+  row = Array()
+  for chunk in binary
+    chunk = parseInt(chunk)
+    switch chunk
+      when 1
+        row.push(1) # White
+      when 10
+        row.push(2) # Black
+      else
+        row.push(0) # Empty
+    if row.length is size
+      board.push(row) # Add row, and start a new one
+      row = Array()
+  return board
+
 # Get the current game state
 get_game_state = ()->
   parts = get_url_parts()
   if parts.length == 3 # Check we have all the parts we need
-    size = parseInt(parts[0])
-    turn = parseInt(parts[1])
-    state_id = parseInt(parts[2])
+    size = parseInt(parts[0]) # Row count (or column count. Square!)
+    turn = parseInt(parts[1]) # Number of turns
+    state_id = parseInt(parts[2]) # ID of game state
 
     if not isNaN(size) and not isNaN(turn) and not isNaN(state_id) # Quick validation
-      state_pos = pad(state_id.toString(2), "0", size * 4) # Get our binaries
+      cell_num = size ** 2 # Number of cells in square board
+      state_pos = pad(state_id.toString(2), "0", cell_num * 4) # Get our binaries. 4 = two bytes per chunk, two states
+      current = Array() # Current game state
+      last = Array() # Previous game state
+      for a in [0 ... cell_num * 2] # Loop our states
+        b = a * 2
+        chunk = state_pos.substring(b, b+2) # Split the sequence into chunks
+        if a < cell_num
+          current.push(chunk)
+        else
+          last.push(chunk)
+
+      binary_to_board(current, size)
       state =
         size: size # Size of board
         turn_number: turn # How many turns have passed
         player: turn % 2 # Current player : 0 = white, 1 = black
         current: Array() # Current board state
         last: Array() # Last board state
-      for a in [0 ... size * 2] # Loop our current state
-        b = a * 2
-        chunk = state_pos.substring(b, b+2) # Split the sequence into chunks
-        if a < size
-          state.current.push(chunk)
-        else
-          state.last.push(chunk)
+
+
       return state
 
   throw "Invalid URL and Game State"
