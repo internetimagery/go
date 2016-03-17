@@ -42,7 +42,7 @@ binary_to_board = (binary, size)->
 
 # Get the current game state
 get_game_state = ()->
-  parts = URL.hash.substring(1, URL.hash.length).split("-")
+  parts = URL.hash.substring(1).split("-")
   if parts.length == 3 # Check we have all the parts we need
     size = parseInt(parts[0]) # Row count (or column count. Square!)
     turn = parseInt(parts[1]) # Number of turns
@@ -72,13 +72,39 @@ get_game_state = ()->
   throw "Invalid URL and Game State"
 
 # Convert current game state to URL
-set_game_state = (state)->
-  console.log URL
+put_game_state = (state)->
+  size = parseInt(state.size)
+  turn = parseInt(state.turn_number)
+
+  if isNaN(size) or isNaN(turn) or state.current.length isnt state.last.length # Quick check
+    throw "Invalid Game State"
+
+  binary_stream = "" # Rebuild Binary
+  for stream in Array(state.current, state.last)
+    for row in stream
+      for col in row
+        switch col
+          when 1 # White
+            binary_stream += "01"
+          when 2 # Black
+            binary_stream += "10"
+          else
+            binary_stream += "00"
+
+  test = ""
+  for i in [0 ... 19 ** 2 * 4]
+    test += "1"
+  console.log parseInt(test, 2)
+  state_id = parseInt("000001001001100010100010011001001001001010100100100000000000000000000000", 2)
+
+
+  console.log state_id
+
 
 
 state = get_game_state()
 console.log state
-set_game_state(state)
+put_game_state(state)
 #
 #
 #

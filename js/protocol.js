@@ -1,5 +1,5 @@
 (function() {
-  var URL, binary_to_board, get_game_state, pad, set_game_state, state;
+  var URL, binary_to_board, get_game_state, pad, put_game_state, state;
 
   pad = function(str, val, len) {
     while (str.length < len) {
@@ -39,7 +39,7 @@
 
   get_game_state = function() {
     var a, b, cell_num, chunk, current, last, parts, size, state, state_id, state_pos, turn, _i, _ref;
-    parts = URL.hash.substring(1, URL.hash.length).split("-");
+    parts = URL.hash.substring(1).split("-");
     if (parts.length === 3) {
       size = parseInt(parts[0]);
       turn = parseInt(parts[1]);
@@ -71,14 +71,47 @@
     throw "Invalid URL and Game State";
   };
 
-  set_game_state = function(state) {
-    return console.log(URL);
+  put_game_state = function(state) {
+    var binary_stream, col, i, row, size, state_id, stream, test, turn, _i, _j, _k, _l, _len, _len1, _len2, _ref, _ref1;
+    size = parseInt(state.size);
+    turn = parseInt(state.turn_number);
+    if (isNaN(size) || isNaN(turn) || state.current.length !== state.last.length) {
+      throw "Invalid Game State";
+    }
+    binary_stream = "";
+    _ref = Array(state.current, state.last);
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      stream = _ref[_i];
+      for (_j = 0, _len1 = stream.length; _j < _len1; _j++) {
+        row = stream[_j];
+        for (_k = 0, _len2 = row.length; _k < _len2; _k++) {
+          col = row[_k];
+          switch (col) {
+            case 1:
+              binary_stream += "01";
+              break;
+            case 2:
+              binary_stream += "10";
+              break;
+            default:
+              binary_stream += "00";
+          }
+        }
+      }
+    }
+    test = "";
+    for (i = _l = 0, _ref1 = Math.pow(19, 2) * 4; 0 <= _ref1 ? _l < _ref1 : _l > _ref1; i = 0 <= _ref1 ? ++_l : --_l) {
+      test += "1";
+    }
+    console.log(parseInt(test, 2));
+    state_id = parseInt("000001001001100010100010011001001001001010100100100000000000000000000000", 2);
+    return console.log(state_id);
   };
 
   state = get_game_state();
 
   console.log(state);
 
-  set_game_state(state);
+  put_game_state(state);
 
 }).call(this);
