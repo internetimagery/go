@@ -1,0 +1,48 @@
+/*Board Stylings!*/
+
+#board {
+  width: 500px;
+  height: 500px;
+  background: url("../img/purty_wood.png");
+  box-shadow: 0px 3px 8px 0px black;
+}
+
+/*GRID*/
+.line {
+  background-color: black;
+  position: absolute;
+}
+
+.horiz {
+  left: 0px;
+  height: 1px;
+  width: 100%
+}
+
+.vert {
+  top: 0px;
+  height: 100%;
+  width: 1px;
+}
+
+/*STONES*/
+.stone {
+  border-radius: 50%;
+}
+
+.set {
+  box-shadow: 0px 2px 5px 0px black, inset -10px -10px 20px rgba(0,0,0,0.5);
+}
+
+.white {
+  background-color: white;
+}
+
+.black {
+  background-color: rgb(60, 60, 60);;
+}
+
+.empty:hover {
+  background-color: blue;
+  border-radius: 50%;
+}
