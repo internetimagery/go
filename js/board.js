@@ -1,5 +1,5 @@
 (function() {
-  var Board, Create, Resize, b;
+  var Board, Create, Resize, b, player;
 
   Resize = function(x, y, w, h, style) {
     return this.setAttribute("style", ("left:" + x + "%;top:" + y + "%;width:" + w + "%;height:" + h + "%;") + style);
@@ -19,6 +19,7 @@
       var col, col_chunk, inner, inner_frame_pos, inner_frame_span, row, row_chunk, socket, socket_row, stone_size, _fn, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
       this.rows = rows;
       this.cols = cols;
+      this.callbacks = Array();
       if (this.rows < 2 || this.cols < 2) {
         throw "Board size not big enough.";
       }
@@ -63,8 +64,19 @@
       return this.sockets[row][col].setAttribute("class", stone);
     };
 
+    Board.prototype.register = function(func) {
+      return this.callbacks.push(func);
+    };
+
     Board.prototype.placement_event = function(row, col, event) {
-      return console.log("Clicked: ", row, col, event);
+      var func, _i, _len, _ref, _results;
+      _ref = this.callbacks;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        func = _ref[_i];
+        _results.push(func(row, col, event));
+      }
+      return _results;
     };
 
     return Board;
@@ -72,6 +84,18 @@
   })();
 
   b = new Board(document.getElementById("board"), 8, 8);
+
+  player = "black";
+
+  b.register(function(row, col, event) {
+    console.log("Clicked! ->", row, col, event);
+    if (player === "white") {
+      player = "black";
+    } else {
+      player = "white";
+    }
+    return b.place(row, col, "stone set " + player);
+  });
 
   b.place(2, 2, "stone set white");
 

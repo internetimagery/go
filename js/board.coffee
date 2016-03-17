@@ -14,6 +14,7 @@ Create = (name, parent)->
 
 class Board
   constructor: (element, @rows, @cols) ->
+    @callbacks = Array()
     if @rows < 2 or @cols < 2
       throw "Board size not big enough."
 
@@ -56,14 +57,29 @@ class Board
       throw "Requested position not within board size."
     @sockets[row][col].setAttribute("class", stone)
 
+  # Register callback for placement events
+  register: (func)->
+    @callbacks.push(func)
+
   # Trigger events on board click
   placement_event: (row, col, event)->
-    console.log "Clicked: ", row, col, event
+    for func in @callbacks
+      func(row, col, event)
+
 
 
 
 
 b = new Board(document.getElementById("board"), 8, 8)
+player = "black"
+b.register (row, col, event)->
+  console.log "Clicked! ->", row, col, event
+  if player == "white"
+    player = "black"
+  else
+    player = "white"
+  b.place(row, col, "stone set #{player}")
+
 b.place(2, 2, "stone set white")
 b.place(5, 4, "stone set black")
 b.place(7, 1, "stone set black")
