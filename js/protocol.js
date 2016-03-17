@@ -1,5 +1,5 @@
 (function() {
-  var URL, binary_to_board, get_game_state, pad, put_game_state, state;
+  var Counter, URL, binary_to_board, get_game_state, pad, put_game_state, state;
 
   pad = function(str, val, len) {
     while (str.length < len) {
@@ -7,6 +7,39 @@
     }
     return str;
   };
+
+  Counter = (function() {
+    function Counter(base) {
+      this.base = base;
+      this.value = 0;
+      this.next = null;
+    }
+
+    Counter.prototype.add = function() {
+      this.value += 1;
+      if (this.value >= this.base) {
+        this.value = 0;
+        if (this.next === null) {
+          this.next = new Counter(this.base);
+          return this.next.add();
+        } else {
+          return this.next.add();
+        }
+      }
+    };
+
+    Counter.prototype.concat = function() {
+      var num;
+      num = this.value.toString();
+      if (this.next !== null) {
+        num = this.next.concat() + num;
+      }
+      return num;
+    };
+
+    return Counter;
+
+  })();
 
   URL = document.createElement("a");
 

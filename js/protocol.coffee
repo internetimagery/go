@@ -18,6 +18,27 @@ pad = (str, val, len)->
     str += val
   return str
 
+# Count an arbitrary number
+class Counter
+  constructor: (@base) ->
+    @value = 0
+    @next = null
+  add: ()->
+    @value += 1
+    if @value >= @base
+      @value = 0
+      if @next == null
+        @next = new Counter(@base)
+        @next.add()
+      else
+        @next.add()
+
+  concat: ()->
+    num = @value.toString()
+    if @next != null
+      num = @next.concat() + num
+    return num
+
 # Get our query to parse
 URL = document.createElement("a") # Create temporary element
 URL.href = window.location.href # Apply url for built in parsing
