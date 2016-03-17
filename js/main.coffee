@@ -59,60 +59,26 @@ parseBoard = (board)->
     white: white
     black: black
 
-# Put the board on screen
-drawBoard = (board)->
-  board_elem = document.getElementById("board")
-  console.log board_elem
-
-
-##############
-# GAME FUNCTIONALITY
-##############
-
-# Todo:
-  # make background tile so board size can scale
-
-# Variabes
-board_dimensions = Array(400, 400)
-border_margin = 0.05
-
-# Elements
-board = formBoard(4, "10100", "000000001") # Initialize Board
-inner_board = null
-lines = Array() # Lines on the board
-
-line = null
-
-# Load assets
-preload = ()->
-  game.load.image "wood", "img/purty_wood.png"
-
-# Create board etc
-create = ()->
-  game.add.image(0, 0, "wood") # Add Background
-  margin_nset = 1 - border_margin * 2
-  inner_board = new Phaser.Rectangle(border_margin * board_dimensions[0], border_margin * board_dimensions[1], margin_nset * board_dimensions[0], margin_nset * board_dimensions[1])
-
-
-  console.log inner_board
 
 
 
-  line = new Phaser.Line(2, 4, 300, 200)
-
-update = ()->
-
-render = ()->
-  game.debug.geom(inner_board, "#000000")
-  game.debug.geom(line, "#000000")
 
 
 
-game = new Phaser.Game board_dimensions[0], board_dimensions[1], Phaser.AUTO, document.getElementById("board"),
-  preload: preload
-  create: create
-  update: update
-  render: render
+b = new Board(document.getElementById("board"), 8, 8)
+player = "black"
+b.register (row, col, event)->
+  console.log "Clicked! ->", row, col, event
+  if player == "white"
+    player = "black"
+  else
+    player = "white"
+  b.place(row, col, "stone set #{player}")
+
+b.place(2, 2, "stone set white")
+b.place(5, 4, "stone set black")
+b.place(7, 1, "stone set black")
+b.place(5, 3, "stone set white")
 
 
 

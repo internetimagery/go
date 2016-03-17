@@ -1,5 +1,5 @@
 (function() {
-  var board, board_dimensions, border_margin, create, drawBoard, formBoard, game, genPositions, getPositions, inner_board, line, lines, parseBoard, parseURL, preload, render, update;
+  var b, formBoard, genPositions, getPositions, parseBoard, parseURL, player;
 
   parseURL = function() {
     var elem, parse, query, url;
@@ -73,49 +73,26 @@
     };
   };
 
-  drawBoard = function(board) {
-    var board_elem;
-    board_elem = document.getElementById("board");
-    return console.log(board_elem);
-  };
+  b = new Board(document.getElementById("board"), 8, 8);
 
-  board_dimensions = Array(400, 400);
+  player = "black";
 
-  border_margin = 0.05;
-
-  board = formBoard(4, "10100", "000000001");
-
-  inner_board = null;
-
-  lines = Array();
-
-  line = null;
-
-  preload = function() {
-    return game.load.image("wood", "img/purty_wood.png");
-  };
-
-  create = function() {
-    var margin_nset;
-    game.add.image(0, 0, "wood");
-    margin_nset = 1 - border_margin * 2;
-    inner_board = new Phaser.Rectangle(border_margin * board_dimensions[0], border_margin * board_dimensions[1], margin_nset * board_dimensions[0], margin_nset * board_dimensions[1]);
-    console.log(inner_board);
-    return line = new Phaser.Line(2, 4, 300, 200);
-  };
-
-  update = function() {};
-
-  render = function() {
-    game.debug.geom(inner_board, "#000000");
-    return game.debug.geom(line, "#000000");
-  };
-
-  game = new Phaser.Game(board_dimensions[0], board_dimensions[1], Phaser.AUTO, document.getElementById("board"), {
-    preload: preload,
-    create: create,
-    update: update,
-    render: render
+  b.register(function(row, col, event) {
+    console.log("Clicked! ->", row, col, event);
+    if (player === "white") {
+      player = "black";
+    } else {
+      player = "white";
+    }
+    return b.place(row, col, "stone set " + player);
   });
+
+  b.place(2, 2, "stone set white");
+
+  b.place(5, 4, "stone set black");
+
+  b.place(7, 1, "stone set black");
+
+  b.place(5, 3, "stone set white");
 
 }).call(this);

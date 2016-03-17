@@ -1,5 +1,5 @@
 (function() {
-  var Board, Create, Resize, b, player;
+  var Board, Create, Resize;
 
   Resize = function(x, y, w, h, style) {
     return this.setAttribute("style", ("left:" + x + "%;top:" + y + "%;width:" + w + "%;height:" + h + "%;") + style);
@@ -83,26 +83,6 @@
 
   })();
 
-  b = new Board(document.getElementById("board"), 8, 8);
-
-  player = "black";
-
-  b.register(function(row, col, event) {
-    console.log("Clicked! ->", row, col, event);
-    if (player === "white") {
-      player = "black";
-    } else {
-      player = "white";
-    }
-    return b.place(row, col, "stone set " + player);
-  });
-
-  b.place(2, 2, "stone set white");
-
-  b.place(5, 4, "stone set black");
-
-  b.place(7, 1, "stone set black");
-
-  b.place(5, 3, "stone set white");
+  this.Board = Board;
 
 }).call(this);
