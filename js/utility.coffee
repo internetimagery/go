@@ -41,7 +41,7 @@ get_surroundings = (pos, size)->
   return surroundings
 
 # Get player at a given position. Empty = 0, White = 1, Black = 2
-get_player_at_pos(pos, board)->
+get_player_at_pos = (pos, board)->
   console.log "TODO: MAKE THIS WORK"
   return 1 # TEMP returning black always
 

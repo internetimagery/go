@@ -1,5 +1,5 @@
 (function() {
-  var Board, Create, Resize, b, player;
+  var Board, Create, Resize;
 
   Resize = function(x, y, w, h, style) {
     return this.setAttribute("style", ("left:" + x + "%;top:" + y + "%;width:" + w + "%;height:" + h + "%;") + style);
@@ -31,10 +31,10 @@
       inner.resize(inner_frame_pos, inner_frame_pos, inner_frame_span, inner_frame_span, "position:relative;");
       element.appendChild(inner);
       for (row = _i = 0, _ref = this.size; 0 <= _ref ? _i < _ref : _i > _ref; row = 0 <= _ref ? ++_i : --_i) {
-        Create("line horiz", inner).setAttribute("style", "top:" + (row * grid_chunk) + "%;");
+        Create("line-horiz", inner).setAttribute("style", "top:" + (row * grid_chunk) + "%;");
       }
       for (col = _j = 0, _ref1 = this.size; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; col = 0 <= _ref1 ? ++_j : --_j) {
-        Create("line vert", inner).setAttribute("style", "left:" + (col * grid_chunk) + "%;");
+        Create("line-vert", inner).setAttribute("style", "left:" + (col * grid_chunk) + "%;");
       }
       this.sockets = Array();
       for (row = _k = 0, _ref2 = this.size; 0 <= _ref2 ? _k < _ref2 : _k > _ref2; row = 0 <= _ref2 ? ++_k : --_k) {
@@ -49,6 +49,7 @@
         })(this);
         for (col = _l = 0, _ref3 = this.size; 0 <= _ref3 ? _l < _ref3 : _l > _ref3; col = 0 <= _ref3 ? ++_l : --_l) {
           socket = Create("empty", inner);
+          socket.player = 0;
           socket.resize(row * grid_chunk - stone_size * 0.5, col * grid_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;");
           _fn();
           this.sockets.push(socket);
@@ -60,7 +61,15 @@
       if (pos > Math.pow(this.size, 2)) {
         throw "Requested position not within board size.";
       }
-      return this.sockets[pos].setAttribute("class", this.stone_class[stone]);
+      this.sockets[pos].setAttribute("class", this.stone_class[stone]);
+      return this.sockets[pos].player = stone;
+    };
+
+    Board.prototype.get_player = function(pos) {
+      if (pos > Math.pow(this.size, 2)) {
+        throw "Requested position not within board size.";
+      }
+      return this.sockets[pos].player;
     };
 
     Board.prototype.register = function(func) {
@@ -83,27 +92,5 @@
   })();
 
   this.Board = Board;
-
-  b = new Board(document.getElementById("board"), 8);
-
-  player = 1;
-
-  b.register(function(pos) {
-    console.log("Clicked! ->", pos);
-    if (player === 1) {
-      player = 2;
-    } else {
-      player = 1;
-    }
-    return b.place(pos, player);
-  });
-
-  b.place(2, 1);
-
-  b.place(15, 2);
-
-  b.place(8, 1);
-
-  b.place(5, 2);
 
 }).call(this);

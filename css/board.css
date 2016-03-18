@@ -8,21 +8,20 @@
 }
 
 /*GRID*/
-.line {
-  background-color: black;
+.line-horiz {
   position: absolute;
-}
-
-.horiz {
   left: 0px;
-  height: 1px;
+  border-top: 1px solid black;
+  /*height: 1px;*/
   width: 100%
 }
 
-.vert {
+.line-vert {
+  position: absolute;
   top: 0px;
   height: 100%;
-  width: 1px;
+  border-left: 1px solid black;
+  /*width: 1px;*/
 }
 
 /*STONES*/

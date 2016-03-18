@@ -35,16 +35,17 @@ class Board
     element.appendChild(inner)
 
     for row in [0 ... @size]
-      Create("line horiz", inner).setAttribute("style", "top:#{row * grid_chunk}%;")
+      Create("line-horiz", inner).setAttribute("style", "top:#{row * grid_chunk}%;")
 
     for col in [0 ... @size]
-      Create("line vert", inner).setAttribute("style", "left:#{col * grid_chunk}%;")
+      Create("line-vert", inner).setAttribute("style", "left:#{col * grid_chunk}%;")
 
     # Add placeholder positions to place stones
     @sockets = Array()
     for row in [0 ... @size]
       for col in [0 ... @size]
         socket = Create("empty", inner)
+        socket.player = 0
         socket.resize(row * grid_chunk - stone_size * 0.5, col * grid_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;")
         do ()=>
           pos = @sockets.length
@@ -57,6 +58,13 @@ class Board
     if pos > @size ** 2
       throw "Requested position not within board size."
     @sockets[pos].setAttribute("class", @stone_class[stone])
+    @sockets[pos].player = stone
+
+  # Get the current player at position
+  get_player: (pos)->
+    if pos > @size ** 2
+      throw "Requested position not within board size."
+    return @sockets[pos].player
 
   # Register callback for placement events
   register: (func)->
@@ -70,19 +78,20 @@ class Board
 # Export Class
 this.Board = Board
 
-# Usage example
-
-b = new Board(document.getElementById("board"), 8)
-player = 1
-b.register (pos)->
-  console.log "Clicked! ->", pos
-  if player == 1
-    player = 2
-  else
-    player = 1
-  b.place(pos, player)
-
-b.place(2, 1)
-b.place(15, 2)
-b.place(8, 1)
-b.place(5, 2)
+# # Usage example
+#
+# b = new Board(document.getElementById("board"), 8)
+# player = 1
+# b.register (pos)->
+#   console.log "Clicked! ->", pos
+#   if player == 1
+#     player = 2
+#   else
+#     player = 1
+#   b.place(pos, player)
+#
+# b.place(2, 1)
+# b.place(15, 2)
+# console.log "Player at 15", b.get_player(15)
+# b.place(8, 1)
+# b.place(5, 2)
