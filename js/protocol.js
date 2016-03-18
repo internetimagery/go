@@ -26,11 +26,16 @@
       cell_num = Math.pow(game_data.board_size, 2);
       for (i = _i = 0, _ref = turn_data.length / 3; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         i *= 3;
-        chunk = parseInt(turn_data.substring(i, i + 3));
-        if (isNaN(chunk) || chunk > cell_num) {
-          throw "Invalid Turn " + (i / 3 + 1) + ".";
+        chunk = turn_data.substring(i, i + 3);
+        if (chunk === "---") {
+          game_data.moves.push(chunk);
+        } else {
+          chunk = parseInt(chunk);
+          if (isNaN(chunk) || chunk > cell_num) {
+            throw "Invalid Turn " + (i / 3 + 1) + ".";
+          }
+          game_data.moves.push(chunk);
         }
-        game_data.moves.push(chunk);
       }
       if (game_data.moves.length > 650) {
         throw "Turns exceeded turn limit of 650.";

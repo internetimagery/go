@@ -5,11 +5,12 @@
 # RULES
   # - Enforce a limit of 2000 characters to the URL.
   # - Subtract 50 characters for use in domain / host / page / etc.
-  # - All digits, following a hash.
+  # - All digits and dashes, following a hash.
   # - First two digits refer to board size.
   # - Board size limit is 2 - 31.
   # - Split the following digits into chunks of 3. Chunks represent a turn each.
   # - Turns in chronilogical order
+  # - Chunks are board positions or three dashes is a pass
   # - Turn limit of 650
   # - Number of turns and current game state can be determined by looking at the history
   # - Current player can be determined by turn number
@@ -43,10 +44,14 @@ Get_Game_Data = ()->
     cell_num = game_data.board_size ** 2 # Number of cells in the board.
     for i in [0 ... turn_data.length / 3] # Chunk the data
       i *= 3
-      chunk = parseInt(turn_data.substring(i, i + 3))
-      if isNaN(chunk) or chunk > cell_num # Check the move can fit on the board
-        throw "Invalid Turn #{i / 3 + 1}."
-      game_data.moves.push(chunk) # Add turn to our list
+      chunk = turn_data.substring(i, i + 3)
+      if chunk == "---" # Special case. A Pass.
+        game_data.moves.push(chunk)
+      else
+        chunk = parseInt(chunk)
+        if isNaN(chunk) or chunk > cell_num # Check the move can fit on the board
+          throw "Invalid Turn #{i / 3 + 1}."
+        game_data.moves.push(chunk) # Add turn to our list
 
     if game_data.moves.length > 650 # Turn limit.
       throw "Turns exceeded turn limit of 650."

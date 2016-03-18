@@ -158,23 +158,3 @@ this.Board = Board
 # # 18 19 20 21 22 23
 # # 24 25 26 27 28 29
 # # 30 31 32 33 34 35
-#
-# b = new Board(document.getElementById("board"), 6)
-# player = 1
-# b.register (pos)->
-#   console.log "Clicked! ->", pos
-#   if player == 1
-#     player = 2
-#   else
-#     player = 1
-#   b.place(pos, player)
-#   group = b.get_connected_stones(pos)
-#   console.log "Group", group
-#   console.log "Liberties", b.get_liberties(group)
-#   console.log "Captured", b.is_captured(pos)
-# b.place(9, 1)
-# b.place(15, 1)
-# b.place(18, 1)
-# b.place(19, 1)
-# b.place(20, 1)
-# b.place(21, 1)

@@ -47,8 +47,17 @@
       _ref = game_data.moves;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         move = _ref[_i];
-        state = play_stone(game_states.length % 2 + 1, move, board);
-        game_states.push(state);
+        console.log("HERE", move);
+        if (move === "---") {
+          if (game_states.length === 0) {
+            game_states.push(board.dump_state());
+          } else {
+            game_states.push(game_states[-1]);
+          }
+        } else {
+          state = play_stone(game_states.length % 2 + 1, move, board);
+          game_states.push(state);
+        }
       }
       current_turn = game_states.length;
     }

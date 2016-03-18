@@ -54,8 +54,15 @@ main = ()->
     console.log "!! LOADING GAME !!"
     # TODO: Add the ability to traverse game states
     for move in game_data.moves
-      state = play_stone(game_states.length % 2 + 1, move, board)
-      game_states.push(state)
+      console.log "HERE", move
+      if move == "---" # Move is a pass
+        if game_states.length == 0 # First move was a pass
+          game_states.push(board.dump_state()) # Dump a blank state
+        else
+          game_states.push(game_states[-1]) # Copy the last game state
+      else
+        state = play_stone(game_states.length % 2 + 1, move, board)
+        game_states.push(state)
     current_turn = game_states.length
 
   # Allow the player to place stones!
