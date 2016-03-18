@@ -47,10 +47,6 @@ num = new Node(10)
 num.insert(test)
 console.log num.get()
 
-# num = new Node(10)
-# for i in [0 ... 20]
-#   num.add()
-#   console.log num.get()
-for i in [0 ... 20]
+while num.get != "0"
   num.sub()
   console.log num.get()

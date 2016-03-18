@@ -1,5 +1,5 @@
 (function() {
-  var Node, i, num, test, test_bin, test_num, _i;
+  var Node, num, test, test_bin, test_num;
 
   Node = (function() {
     function Node(base, depth) {
@@ -72,7 +72,7 @@
 
   console.log(num.get());
 
-  for (i = _i = 0; _i < 20; i = ++_i) {
+  while (num.get !== "0") {
     num.sub();
     console.log(num.get());
   }
