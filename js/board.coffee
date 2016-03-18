@@ -15,11 +15,16 @@ Create = (name, parent)->
 class Board
   constructor: (element, @size) ->
     @callbacks = Array()
+    @stone_class = Array(
+      "empty",
+      "stone set white",
+      "stone set black"
+      )
     if @size < 2
       throw "Board size not big enough."
 
     # Size some things proportionate to the board size
-    grid_chunk = 100 / @size # Space between grids
+    grid_chunk = 100 / (@size - 1) # Space between grids
     stone_size = grid_chunk * 1
 
     # Create an inner frame, smaller than the board, so our stones don't fall off the sides
@@ -37,24 +42,21 @@ class Board
 
     # Add placeholder positions to place stones
     @sockets = Array()
-    pos = 0
     for row in [0 ... @size]
-      socket_row = Array() # Create a row to place sockets
       for col in [0 ... @size]
         socket = Create("empty", inner)
         socket.resize(row * grid_chunk - stone_size * 0.5, col * grid_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;")
-        do (pos)=>
+        do ()=>
+          pos = @sockets.length
           socket.onclick = (event)=>
             @placement_event(pos)
-        socket_row.push(socket)
-        pos += 1
-      @sockets.push(socket_row)
+        @sockets.push(socket)
 
   # Place a stone on the requested spot
   place: (pos, stone)->
     if pos > @size ** 2
       throw "Requested position not within board size."
-    @sockets[pos].setAttribute("class", stone)
+    @sockets[pos].setAttribute("class", @stone_class[stone])
 
   # Register callback for placement events
   register: (func)->
@@ -69,18 +71,18 @@ class Board
 this.Board = Board
 
 # Usage example
-#
-# b = new Board(document.getElementById("board"), 8, 8)
-# player = "black"
-# b.register (row, col, event)->
-#   console.log "Clicked! ->", row, col, event
-#   if player == "white"
-#     player = "black"
-#   else
-#     player = "white"
-#   b.place(row, col, "stone set #{player}")
-#
-# b.place(2, 2, "stone set white")
-# b.place(5, 4, "stone set black")
-# b.place(7, 1, "stone set black")
-# b.place(5, 3, "stone set white")
+
+b = new Board(document.getElementById("board"), 8)
+player = 1
+b.register (pos)->
+  console.log "Clicked! ->", pos
+  if player == 1
+    player = 2
+  else
+    player = 1
+  b.place(pos, player)
+
+b.place(2, 1)
+b.place(15, 2)
+b.place(8, 1)
+b.place(5, 2)

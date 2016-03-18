@@ -39,3 +39,21 @@ get_surroundings = (pos, size)->
   else
     surroundings.down = dir
   return surroundings
+
+# Get player at a given position. Empty = 0, White = 1, Black = 2
+get_player_at_pos(pos, board)->
+  console.log "TODO: MAKE THIS WORK"
+  return 1 # TEMP returning black always
+
+# Walk through all stones connected together and put into an array.
+get_connected_stones = (pos, board, size)->
+  group = Array(pos)
+  surroundings = get_surroundings(pos, size)
+  console.log surroundings.left is null
+
+
+# TODO: walk connected STONES
+# TODO: get liberties of a group
+# TODO: check for ko
+
+b = new Board(document.getElementById("board"), 6)
