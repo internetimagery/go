@@ -116,40 +116,59 @@ class Board
 
     while stack.length > 0
       pos = stack.pop()
-      surroundings = @get_surroundings(pos)
-      for dir, dir_pos of surroundings # Loop our options
+      for dir, dir_pos of @get_surroundings(pos) # Loop our options
         if dir_pos != null and @get_player(dir_pos) == player and dir_pos not in group
           group.push(dir_pos)
           stack.push(dir_pos)
     return group
 
+  # Get the liberties of a group
+  get_liberties: (group)->
+    liberties = Array()
+    for pos in group
+      for dir, dir_pos of @get_surroundings(pos)
+        if dir_pos != null and @get_player(dir_pos) == 0 # Check for empty fields
+          liberties.push(dir_pos)
+    return liberties
+
+  # Check if stone is captured
+  is_captured: (pos)->
+    player = @get_player(pos)
+    group = @get_connected_stones(pos)
+    liberties = @get_liberties(group)
+    return if liberties.length > 0 then false else true
+
 
 # Export Class
 this.Board = Board
 
-# TESTING
-# Using Eample Grid
-# POSITION GRID 6X
-#  0  1  2  3  4  5
-#  6  7 [8] 9 10 11
-# 12 13 14 15 16 17
-# 18 19 20 21 22 23
-# 24 25 26 27 28 29
-# 30 31 32 33 34 35
-
-b = new Board(document.getElementById("board"), 6)
-player = 1
-b.register (pos)->
-  console.log "Clicked! ->", pos
-  if player == 1
-    player = 2
-  else
-    player = 1
-  b.place(pos, player)
-  console.log "Group", b.get_connected_stones(pos)
-b.place(9, 1)
-b.place(15, 1)
-b.place(18, 1)
-b.place(19, 1)
-b.place(20, 1)
-b.place(21, 1)
+#
+# # TESTING
+# # Using Eample Grid
+# # POSITION GRID 6X
+# #  0  1  2  3  4  5
+# #  6  7 [8] 9 10 11
+# # 12 13 14 15 16 17
+# # 18 19 20 21 22 23
+# # 24 25 26 27 28 29
+# # 30 31 32 33 34 35
+#
+# b = new Board(document.getElementById("board"), 6)
+# player = 1
+# b.register (pos)->
+#   console.log "Clicked! ->", pos
+#   if player == 1
+#     player = 2
+#   else
+#     player = 1
+#   b.place(pos, player)
+#   group = b.get_connected_stones(pos)
+#   console.log "Group", group
+#   console.log "Liberties", b.get_liberties(group)
+#   console.log "Captured", b.is_captured(pos)
+# b.place(9, 1)
+# b.place(15, 1)
+# b.place(18, 1)
+# b.place(19, 1)
+# b.place(20, 1)
+# b.place(21, 1)

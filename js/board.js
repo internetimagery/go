@@ -1,5 +1,5 @@
 (function() {
-  var Board, Create, Resize, b, player,
+  var Board, Create, Resize,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   Resize = function(x, y, w, h, style) {
@@ -121,15 +121,15 @@
     };
 
     Board.prototype.get_connected_stones = function(pos) {
-      var dir, dir_pos, group, player, stack, surroundings;
+      var dir, dir_pos, group, player, stack, _ref;
       group = [pos];
       player = this.get_player(pos);
       stack = [pos];
       while (stack.length > 0) {
         pos = stack.pop();
-        surroundings = this.get_surroundings(pos);
-        for (dir in surroundings) {
-          dir_pos = surroundings[dir];
+        _ref = this.get_surroundings(pos);
+        for (dir in _ref) {
+          dir_pos = _ref[dir];
           if (dir_pos !== null && this.get_player(dir_pos) === player && __indexOf.call(group, dir_pos) < 0) {
             group.push(dir_pos);
             stack.push(dir_pos);
@@ -139,37 +139,38 @@
       return group;
     };
 
+    Board.prototype.get_liberties = function(group) {
+      var dir, dir_pos, liberties, pos, _i, _len, _ref;
+      liberties = Array();
+      for (_i = 0, _len = group.length; _i < _len; _i++) {
+        pos = group[_i];
+        _ref = this.get_surroundings(pos);
+        for (dir in _ref) {
+          dir_pos = _ref[dir];
+          if (dir_pos !== null && this.get_player(dir_pos) === 0) {
+            liberties.push(dir_pos);
+          }
+        }
+      }
+      return liberties;
+    };
+
+    Board.prototype.is_captured = function(pos) {
+      var group, liberties, player;
+      player = this.get_player(pos);
+      group = this.get_connected_stones(pos);
+      liberties = this.get_liberties(group);
+      if (liberties.length > 0) {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
     return Board;
 
   })();
 
   this.Board = Board;
-
-  b = new Board(document.getElementById("board"), 6);
-
-  player = 1;
-
-  b.register(function(pos) {
-    console.log("Clicked! ->", pos);
-    if (player === 1) {
-      player = 2;
-    } else {
-      player = 1;
-    }
-    b.place(pos, player);
-    return console.log("Group", b.get_connected_stones(pos));
-  });
-
-  b.place(9, 1);
-
-  b.place(15, 1);
-
-  b.place(18, 1);
-
-  b.place(19, 1);
-
-  b.place(20, 1);
-
-  b.place(21, 1);
 
 }).call(this);
