@@ -42,25 +42,18 @@ get_surroundings = (pos, size)->
 
 # Walk through all stones connected together and put into an array.
 get_connected_stones = (pos, board, size)->
-  group = []
+  group = [pos]
   player = board.get_player(pos) # Get the player we're tracking
   stack = [pos]
 
-  # while stack.length > 0
-  pos = stack.pop()
-  surroundings = get_surroundings(pos, size)
-  # for dir, dir_pos of surroundings # Loop our options
-
-
-
-  #   if surroundings.left isnt null and board.get_player(surroundings.left) == player
-  #     stack.push(surroundings.left)
-  #   if surroundings.right isnt null and board.get_player(surroundings.right) == player
-  #     stack.push(surroundings.right)
-  #   if surroundings.left isnt null and board.get_player(surroundings.left) == player
-  #     stack.push(surroundings.left)
-  #   if surroundings.left isnt null and board.get_player(surroundings.left) == player
-  #     stack.push(surroundings.left)
+  while stack.length > 0
+    pos = stack.pop()
+    surroundings = get_surroundings(pos, size)
+    for dir, dir_pos of surroundings # Loop our options
+      if dir_pos != null and board.get_player(dir_pos) == player and dir_pos not in group
+        group.push(dir_pos)
+        stack.push(dir_pos)
+  return group
 
 
 
@@ -75,7 +68,9 @@ b.register (pos)->
   console.log "Clicked! ->", pos
 b.place(9, 1)
 b.place(15, 1)
-b.place(21, 1)
+b.place(18, 1)
+b.place(19, 1)
 b.place(20, 1)
+b.place(21, 1)
 
 console.log get_connected_stones(9, b, 6)

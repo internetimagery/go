@@ -1,5 +1,6 @@
 (function() {
-  var b, get_connected_stones, get_surroundings;
+  var b, get_connected_stones, get_surroundings,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   get_surroundings = function(pos, size) {
     var dir, dir_check, surroundings;
@@ -34,12 +35,22 @@
   };
 
   get_connected_stones = function(pos, board, size) {
-    var group, player, stack, surroundings;
-    group = [];
+    var dir, dir_pos, group, player, stack, surroundings;
+    group = [pos];
     player = board.get_player(pos);
     stack = [pos];
-    pos = stack.pop();
-    return surroundings = get_surroundings(pos, size);
+    while (stack.length > 0) {
+      pos = stack.pop();
+      surroundings = get_surroundings(pos, size);
+      for (dir in surroundings) {
+        dir_pos = surroundings[dir];
+        if (dir_pos !== null && board.get_player(dir_pos) === player && __indexOf.call(group, dir_pos) < 0) {
+          group.push(dir_pos);
+          stack.push(dir_pos);
+        }
+      }
+    }
+    return group;
   };
 
   b = new Board(document.getElementById("board"), 6);
@@ -52,9 +63,13 @@
 
   b.place(15, 1);
 
-  b.place(21, 1);
+  b.place(18, 1);
+
+  b.place(19, 1);
 
   b.place(20, 1);
+
+  b.place(21, 1);
 
   console.log(get_connected_stones(9, b, 6));
 
