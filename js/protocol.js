@@ -27,15 +27,15 @@
       for (i = _i = 0, _ref = turn_data.length / 3; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         i *= 3;
         chunk = parseInt(turn_data.substring(i, i + 3));
-        if (isNaN(chunk) || chunk < 1 || chunk > cell_num) {
+        if (isNaN(chunk) || chunk > cell_num) {
           throw "Invalid Turn " + (i / 3 + 1) + ".";
         }
-        console.log(chunk);
         game_data.moves.push(chunk);
       }
       if (game_data.moves.length > 650) {
         throw "Turns exceeded turn limit of 650.";
       }
+      console.log("Valid!");
     } else {
       console.log("No Game Data found.");
     }
