@@ -13,14 +13,13 @@ Create = (name, parent)->
   return elem
 
 class Board
-  constructor: (element, @size) ->
+  constructor: (element, @rows, @cols) ->
     @callbacks = Array()
-    if @size < 2
+    if @rows < 2 or @cols < 2
       throw "Board size not big enough."
 
     # Size some things proportionate to the board size
-    grid_chunk = 100 / @size # Space between grids
-    stone_size = grid_chunk * 1
+    stone_size = 200 / (@rows + @cols)
 
     # Create an inner frame, smaller than the board, so our stones don't fall off the sides
     inner = Create("grid", element)
@@ -29,41 +28,43 @@ class Board
     inner.resize(inner_frame_pos, inner_frame_pos, inner_frame_span, inner_frame_span, "position:relative;")
     element.appendChild(inner)
 
-    for row in [0 ... @size]
-      Create("line horiz", inner).setAttribute("style", "top:#{row * grid_chunk}%;")
+    # Set up our rows and columns
+    row_chunk = 100 / (@rows - 1)
+    col_chunk = 100 / (@cols - 1)
 
-    for col in [0 ... @size]
-      Create("line vert", inner).setAttribute("style", "left:#{col * grid_chunk}%;")
+    for row in [0 ... @rows]
+      Create("line horiz", inner).setAttribute("style", "top:#{row * row_chunk}%;")
+
+    for col in [0 ... @cols]
+      Create("line vert", inner).setAttribute("style", "left:#{col * col_chunk}%;")
 
     # Add placeholder positions to place stones
     @sockets = Array()
-    pos = 0
-    for row in [0 ... @size]
+    for row in [0 ... @rows]
       socket_row = Array() # Create a row to place sockets
-      for col in [0 ... @size]
+      for col in [0 ... @cols]
         socket = Create("empty", inner)
-        socket.resize(row * grid_chunk - stone_size * 0.5, col * grid_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;")
-        do (pos)=>
+        socket.resize(row * row_chunk - stone_size * 0.5, col * col_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;")
+        do (row, col)=>
           socket.onclick = (event)=>
-            @placement_event(pos)
+            @placement_event(row, col, event)
         socket_row.push(socket)
-        pos += 1
       @sockets.push(socket_row)
 
   # Place a stone on the requested spot
-  place: (pos, stone)->
-    if pos > @size ** 2
+  place: (row, col, stone)->
+    if @rows <= row or @cols <= col
       throw "Requested position not within board size."
-    @sockets[pos].setAttribute("class", stone)
+    @sockets[row][col].setAttribute("class", stone)
 
   # Register callback for placement events
   register: (func)->
     @callbacks.push(func)
 
   # Trigger events on board click
-  placement_event: (pos)->
+  placement_event: (row, col, event)->
     for func in @callbacks
-      func(pos)
+      func(row, col, event)
 
 # Export Class
 this.Board = Board

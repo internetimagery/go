@@ -15,66 +15,66 @@
   };
 
   Board = (function() {
-    function Board(element, rows, cols) {
-      var col, col_chunk, inner, inner_frame_pos, inner_frame_span, row, row_chunk, socket, socket_row, stone_size, _fn, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
-      this.rows = rows;
-      this.cols = cols;
+    function Board(element, size) {
+      var col, grid_chunk, inner, inner_frame_pos, inner_frame_span, pos, row, socket, socket_row, stone_size, _fn, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
+      this.size = size;
       this.callbacks = Array();
-      if (this.rows < 2 || this.cols < 2) {
+      if (this.size < 2) {
         throw "Board size not big enough.";
       }
-      stone_size = 200 / (this.rows + this.cols);
+      grid_chunk = 100 / this.size;
+      stone_size = grid_chunk * 1;
       inner = Create("grid", element);
       inner_frame_pos = stone_size * 0.6;
       inner_frame_span = 100 - inner_frame_pos * 2;
       inner.resize(inner_frame_pos, inner_frame_pos, inner_frame_span, inner_frame_span, "position:relative;");
       element.appendChild(inner);
-      row_chunk = 100 / (this.rows - 1);
-      col_chunk = 100 / (this.cols - 1);
-      for (row = _i = 0, _ref = this.rows; 0 <= _ref ? _i < _ref : _i > _ref; row = 0 <= _ref ? ++_i : --_i) {
-        Create("line horiz", inner).setAttribute("style", "top:" + (row * row_chunk) + "%;");
+      for (row = _i = 0, _ref = this.size; 0 <= _ref ? _i < _ref : _i > _ref; row = 0 <= _ref ? ++_i : --_i) {
+        Create("line horiz", inner).setAttribute("style", "top:" + (row * grid_chunk) + "%;");
       }
-      for (col = _j = 0, _ref1 = this.cols; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; col = 0 <= _ref1 ? ++_j : --_j) {
-        Create("line vert", inner).setAttribute("style", "left:" + (col * col_chunk) + "%;");
+      for (col = _j = 0, _ref1 = this.size; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; col = 0 <= _ref1 ? ++_j : --_j) {
+        Create("line vert", inner).setAttribute("style", "left:" + (col * grid_chunk) + "%;");
       }
       this.sockets = Array();
-      for (row = _k = 0, _ref2 = this.rows; 0 <= _ref2 ? _k < _ref2 : _k > _ref2; row = 0 <= _ref2 ? ++_k : --_k) {
+      pos = 0;
+      for (row = _k = 0, _ref2 = this.size; 0 <= _ref2 ? _k < _ref2 : _k > _ref2; row = 0 <= _ref2 ? ++_k : --_k) {
         socket_row = Array();
         _fn = (function(_this) {
-          return function(row, col) {
+          return function(pos) {
             return socket.onclick = function(event) {
-              return _this.placement_event(row, col, event);
+              return _this.placement_event(pos);
             };
           };
         })(this);
-        for (col = _l = 0, _ref3 = this.cols; 0 <= _ref3 ? _l < _ref3 : _l > _ref3; col = 0 <= _ref3 ? ++_l : --_l) {
+        for (col = _l = 0, _ref3 = this.size; 0 <= _ref3 ? _l < _ref3 : _l > _ref3; col = 0 <= _ref3 ? ++_l : --_l) {
           socket = Create("empty", inner);
-          socket.resize(row * row_chunk - stone_size * 0.5, col * col_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;");
-          _fn(row, col);
+          socket.resize(row * grid_chunk - stone_size * 0.5, col * grid_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;");
+          _fn(pos);
           socket_row.push(socket);
+          pos += 1;
         }
         this.sockets.push(socket_row);
       }
     }
 
-    Board.prototype.place = function(row, col, stone) {
-      if (this.rows <= row || this.cols <= col) {
+    Board.prototype.place = function(pos, stone) {
+      if (pos > Math.pow(this.size, 2)) {
         throw "Requested position not within board size.";
       }
-      return this.sockets[row][col].setAttribute("class", stone);
+      return this.sockets[pos].setAttribute("class", stone);
     };
 
     Board.prototype.register = function(func) {
       return this.callbacks.push(func);
     };
 
-    Board.prototype.placement_event = function(row, col, event) {
+    Board.prototype.placement_event = function(pos) {
       var func, _i, _len, _ref, _results;
       _ref = this.callbacks;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         func = _ref[_i];
-        _results.push(func(row, col, event));
+        _results.push(func(pos));
       }
       return _results;
     };
