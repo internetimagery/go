@@ -13,7 +13,7 @@
     }
   };
 
-  play_stone = function(player, pos, board) {
+  play_stone = function(player, pos, board, last_move) {
     var dir, stone, _ref;
     if (board.get_player(pos) !== 0) {
       throw "Placement Failed: Stone is already there.";
@@ -30,7 +30,6 @@
       board.place(pos, 0);
       throw "Placement Failed: Position is Suicide.";
     }
-    console.log("Placed stone at position " + pos + ".", board.get_surroundings(pos));
     return board.dump_state();
   };
 
@@ -47,15 +46,10 @@
       _ref = game_data.moves;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         move = _ref[_i];
-        console.log("HERE", move);
         if (move === "---") {
-          if (game_states.length === 0) {
-            game_states.push(board.dump_state());
-          } else {
-            game_states.push(game_states[-1]);
-          }
+          game_states.push(game_states[game_states.length - 1]);
         } else {
-          state = play_stone(game_states.length % 2 + 1, move, board);
+          state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1]);
           game_states.push(state);
         }
       }

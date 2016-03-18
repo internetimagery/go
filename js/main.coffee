@@ -2,6 +2,7 @@
 
 # TEST LAYOUT
 #05001002005008007012011
+#05---001002005008007012011---004006
 
 # Capture a group
 capture = (stone, board)->
@@ -12,7 +13,7 @@ capture = (stone, board)->
     console.log "Capturing group"
 
 # Play a stone!
-play_stone = (player, pos, board)->
+play_stone = (player, pos, board, last_move)->
   # Validate Placement
   if board.get_player(pos) != 0 # There is a stone already there
     throw "Placement Failed: Stone is already there."
@@ -32,7 +33,7 @@ play_stone = (player, pos, board)->
     board.place(pos, 0) # Undo placement
     throw "Placement Failed: Position is Suicide."
 
-  console.log "Placed stone at position #{pos}.", board.get_surroundings(pos)
+  # console.log "Placed stone at position #{pos}.", board.get_surroundings(pos)
   return board.dump_state()
 
 
@@ -41,6 +42,7 @@ main = ()->
 
   # Start by getting some game data
   # TODO: Add warning popup if gamedata throws error, and try/catch block here
+  # TODO: Could always use alerts, probably best
   game_data = get_game_data() # URL parsed information
   game_states = [] # Record the state of the board
   current_turn = 0 # Where we are currently
@@ -49,19 +51,16 @@ main = ()->
   if game_data.board_size == 0
     console.log "!! NEW GAME !!"
     # TODO: add board size creation window
+    # TODO: In hindsight this isn't required. we can link to a sized board
 
   else
     console.log "!! LOADING GAME !!"
     # TODO: Add the ability to traverse game states
     for move in game_data.moves
-      console.log "HERE", move
       if move == "---" # Move is a pass
-        if game_states.length == 0 # First move was a pass
-          game_states.push(board.dump_state()) # Dump a blank state
-        else
-          game_states.push(game_states[-1]) # Copy the last game state
+        game_states.push(game_states[game_states.length - 1]) # Copy the last game state
       else
-        state = play_stone(game_states.length % 2 + 1, move, board)
+        state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1])
         game_states.push(state)
     current_turn = game_states.length
 
