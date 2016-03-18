@@ -81,7 +81,8 @@ class Board
     if state.length != @size
       throw "Invalid State Size"
     for pos in [0 ... state.length]
-      @place(pos, state[pos])
+      if @get_player(pos) != state[pos]
+        @place(pos, state[pos])
 
   # UTILITY
 
@@ -97,28 +98,20 @@ class Board
     # LEFT
     dir = pos - 1
     dir_check = dir % @size
-    if dir_check == @size - 1 or dir_check < 0
-      surroundings.left = null
-    else
+    if dir_check != @size - 1 and dir_check >= 0
       surroundings.left = dir
     # RIGHT
     dir = pos + 1
     dir_check = dir % @size
-    if dir_check == 0 or dir_check > @size
-      surroundings.right = null
-    else
+    if dir_check != 0 and dir_check <= @size
       surroundings.right = dir
     # UP
     dir = pos - @size
-    if dir < 0
-      surroundings.up = null
-    else
+    if dir >= 0
       surroundings.up = dir
     # DOWN
     dir = pos + @size
-    if dir > @size ** 2
-      surroundings.down = null
-    else
+    if dir <= (@size - 1) ** 2
       surroundings.down = dir
     return surroundings
 
@@ -131,7 +124,7 @@ class Board
     while stack.length > 0
       pos = stack.pop()
       for dir, dir_pos of @get_surroundings(pos) # Loop our options
-        if dir_pos != null and @get_player(dir_pos) == player and dir_pos not in group
+        if @get_player(dir_pos) == player and dir_pos not in group
           group.push(dir_pos)
           stack.push(dir_pos)
     return group
@@ -141,13 +134,12 @@ class Board
     liberties = []
     for pos in group
       for dir, dir_pos of @get_surroundings(pos)
-        if dir_pos != null and @get_player(dir_pos) == 0 # Check for empty fields
+        if @get_player(dir_pos) == 0 # Check for empty fields
           liberties.push(dir_pos)
     return liberties
 
   # Check if stone is captured
-  is_captured: (pos)->
-    player = @get_player(pos)
+  is_surrounded: (pos)->
     group = @get_connected_stones(pos)
     liberties = @get_liberties(group)
     return if liberties.length > 0 then false else true

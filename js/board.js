@@ -97,7 +97,11 @@
       }
       _results = [];
       for (pos = _i = 0, _ref = state.length; 0 <= _ref ? _i < _ref : _i > _ref; pos = 0 <= _ref ? ++_i : --_i) {
-        _results.push(this.place(pos, state[pos]));
+        if (this.get_player(pos) !== state[pos]) {
+          _results.push(this.place(pos, state[pos]));
+        } else {
+          _results.push(void 0);
+        }
       }
       return _results;
     };
@@ -114,28 +118,20 @@
       surroundings = {};
       dir = pos - 1;
       dir_check = dir % this.size;
-      if (dir_check === this.size - 1 || dir_check < 0) {
-        surroundings.left = null;
-      } else {
+      if (dir_check !== this.size - 1 && dir_check >= 0) {
         surroundings.left = dir;
       }
       dir = pos + 1;
       dir_check = dir % this.size;
-      if (dir_check === 0 || dir_check > this.size) {
-        surroundings.right = null;
-      } else {
+      if (dir_check !== 0 && dir_check <= this.size) {
         surroundings.right = dir;
       }
       dir = pos - this.size;
-      if (dir < 0) {
-        surroundings.up = null;
-      } else {
+      if (dir >= 0) {
         surroundings.up = dir;
       }
       dir = pos + this.size;
-      if (dir > Math.pow(this.size, 2)) {
-        surroundings.down = null;
-      } else {
+      if (dir <= Math.pow(this.size - 1, 2)) {
         surroundings.down = dir;
       }
       return surroundings;
@@ -151,7 +147,7 @@
         _ref = this.get_surroundings(pos);
         for (dir in _ref) {
           dir_pos = _ref[dir];
-          if (dir_pos !== null && this.get_player(dir_pos) === player && __indexOf.call(group, dir_pos) < 0) {
+          if (this.get_player(dir_pos) === player && __indexOf.call(group, dir_pos) < 0) {
             group.push(dir_pos);
             stack.push(dir_pos);
           }
@@ -168,7 +164,7 @@
         _ref = this.get_surroundings(pos);
         for (dir in _ref) {
           dir_pos = _ref[dir];
-          if (dir_pos !== null && this.get_player(dir_pos) === 0) {
+          if (this.get_player(dir_pos) === 0) {
             liberties.push(dir_pos);
           }
         }
@@ -176,9 +172,8 @@
       return liberties;
     };
 
-    Board.prototype.is_captured = function(pos) {
-      var group, liberties, player;
-      player = this.get_player(pos);
+    Board.prototype.is_surrounded = function(pos) {
+      var group, liberties;
       group = this.get_connected_stones(pos);
       liberties = this.get_liberties(group);
       if (liberties.length > 0) {

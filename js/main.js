@@ -1,11 +1,35 @@
 (function() {
-  var main, play_stone;
+  var capture, main, play_stone;
+
+  capture = function(stone, board) {
+    var group, _i, _len;
+    if (board.get_player(stone) !== 0) {
+      group = board.get_connected_stones(stone);
+      for (_i = 0, _len = group.length; _i < _len; _i++) {
+        stone = group[_i];
+        board.place(stone, 0);
+      }
+      return console.log("Capturing group");
+    }
+  };
 
   play_stone = function(player, pos, board) {
+    var dir, stone, _ref;
     if (board.get_player(pos) !== 0) {
       throw "Placement Failed: Stone is already there.";
     }
     board.place(pos, player);
+    _ref = board.get_surroundings(pos);
+    for (dir in _ref) {
+      stone = _ref[dir];
+      if (board.is_surrounded(stone)) {
+        capture(stone, board);
+      }
+    }
+    if (board.is_surrounded(pos)) {
+      board.place(pos, 0);
+      throw "Placement Failed: Position is Suicide.";
+    }
     console.log("Placed stone at position " + pos + ".");
     return board.dump_state();
   };
@@ -22,7 +46,7 @@
       console.log("!! LOADING GAME !!");
       board = new Board(board_element, game_data.board_size);
       board.register(function(pos) {
-        return play_stone(1, pos, board);
+        return play_stone(2, pos, board);
       });
       _ref = game_data.moves;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
