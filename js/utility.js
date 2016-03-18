@@ -1,5 +1,5 @@
 (function() {
-  var b, get_connected_stones, get_surroundings,
+  var b, get_connected_stones, get_liberties, get_surroundings,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   get_surroundings = function(pos, size) {
@@ -52,6 +52,8 @@
     }
     return group;
   };
+
+  get_liberties = function(group, board, size) {};
 
   b = new Board(document.getElementById("board"), 6);
 

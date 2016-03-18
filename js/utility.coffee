@@ -55,10 +55,11 @@ get_connected_stones = (pos, board, size)->
         stack.push(dir_pos)
   return group
 
+# Get liberties of a group
+get_liberties = (group, board, size)->
 
 
-# TODO: walk connected STONES
-# TODO: get liberties of a group
+# TODO: get liberties of a group and stone
 # TODO: check for ko
 
 # TESTING

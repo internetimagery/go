@@ -53,19 +53,6 @@ class Board
             @placement_event(pos)
         @sockets.push(socket)
 
-  # Place a stone on the requested spot
-  place: (pos, stone)->
-    if pos > @size ** 2
-      throw "Requested position not within board size."
-    @sockets[pos].setAttribute("class", @stone_class[stone])
-    @sockets[pos].player = stone
-
-  # Get the current player at position
-  get_player: (pos)->
-    if pos > @size ** 2
-      throw "Requested position not within board size."
-    return @sockets[pos].player
-
   # Register callback for placement events
   register: (func)->
     @callbacks.push(func)
@@ -75,23 +62,94 @@ class Board
     for func in @callbacks
       func(pos)
 
+  # Place a stone on the requested spot
+  place: (pos, stone)->
+    if pos > @size ** 2
+      throw "Requested position not within board size."
+    @sockets[pos].setAttribute("class", @stone_class[stone])
+    @sockets[pos].player = stone
+
+  # UTILITY
+
+  # Get the current player at position
+  get_player: (pos)->
+    if pos > @size ** 2
+      throw "Requested position not within board size."
+    return @sockets[pos].player
+
+  # Get surrounding locations of a stone
+  get_surroundings: (pos)->
+    surroundings = {}
+    # LEFT
+    dir = pos - 1
+    dir_check = dir % @size
+    if dir_check == @size - 1 or dir_check < 0
+      surroundings.left = null
+    else
+      surroundings.left = dir
+    # RIGHT
+    dir = pos + 1
+    dir_check = dir % @size
+    if dir_check == 0 or dir_check > @size
+      surroundings.right = null
+    else
+      surroundings.right = dir
+    # UP
+    dir = pos - @size
+    if dir < 0
+      surroundings.up = null
+    else
+      surroundings.up = dir
+    # DOWN
+    dir = pos + @size
+    if dir > @size ** 2
+      surroundings.down = null
+    else
+      surroundings.down = dir
+    return surroundings
+
+  # Walk through all stones connected together and put into an array.
+  get_connected_stones: (pos)->
+    group = [pos]
+    player = @get_player(pos) # Get the player we're tracking
+    stack = [pos]
+
+    while stack.length > 0
+      pos = stack.pop()
+      surroundings = @get_surroundings(pos)
+      for dir, dir_pos of surroundings # Loop our options
+        if dir_pos != null and @get_player(dir_pos) == player and dir_pos not in group
+          group.push(dir_pos)
+          stack.push(dir_pos)
+    return group
+
+
 # Export Class
 this.Board = Board
 
-# # Usage example
-#
-# b = new Board(document.getElementById("board"), 8)
-# player = 1
-# b.register (pos)->
-#   console.log "Clicked! ->", pos
-#   if player == 1
-#     player = 2
-#   else
-#     player = 1
-#   b.place(pos, player)
-#
-# b.place(2, 1)
-# b.place(15, 2)
-# console.log "Player at 15", b.get_player(15)
-# b.place(8, 1)
-# b.place(5, 2)
+# TESTING
+# Using Eample Grid
+# POSITION GRID 6X
+#  0  1  2  3  4  5
+#  6  7 [8] 9 10 11
+# 12 13 14 15 16 17
+# 18 19 20 21 22 23
+# 24 25 26 27 28 29
+# 30 31 32 33 34 35
+
+b = new Board(document.getElementById("board"), 6)
+player = 1
+b.register (pos)->
+  console.log "Clicked! ->", pos
+  if player == 1
+    player = 2
+  else
+    player = 1
+  b.place(pos, player)
+  console.log "Group", b.get_connected_stones(pos)
+b.place(9, 1)
+b.place(15, 1)
+b.place(18, 1)
+b.place(19, 1)
+b.place(20, 1)
+b.place(21, 1)

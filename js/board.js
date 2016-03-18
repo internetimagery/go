@@ -1,5 +1,6 @@
 (function() {
-  var Board, Create, Resize;
+  var Board, Create, Resize, b, player,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   Resize = function(x, y, w, h, style) {
     return this.setAttribute("style", ("left:" + x + "%;top:" + y + "%;width:" + w + "%;height:" + h + "%;") + style);
@@ -57,21 +58,6 @@
       }
     }
 
-    Board.prototype.place = function(pos, stone) {
-      if (pos > Math.pow(this.size, 2)) {
-        throw "Requested position not within board size.";
-      }
-      this.sockets[pos].setAttribute("class", this.stone_class[stone]);
-      return this.sockets[pos].player = stone;
-    };
-
-    Board.prototype.get_player = function(pos) {
-      if (pos > Math.pow(this.size, 2)) {
-        throw "Requested position not within board size.";
-      }
-      return this.sockets[pos].player;
-    };
-
     Board.prototype.register = function(func) {
       return this.callbacks.push(func);
     };
@@ -87,10 +73,103 @@
       return _results;
     };
 
+    Board.prototype.place = function(pos, stone) {
+      if (pos > Math.pow(this.size, 2)) {
+        throw "Requested position not within board size.";
+      }
+      this.sockets[pos].setAttribute("class", this.stone_class[stone]);
+      return this.sockets[pos].player = stone;
+    };
+
+    Board.prototype.get_player = function(pos) {
+      if (pos > Math.pow(this.size, 2)) {
+        throw "Requested position not within board size.";
+      }
+      return this.sockets[pos].player;
+    };
+
+    Board.prototype.get_surroundings = function(pos) {
+      var dir, dir_check, surroundings;
+      surroundings = {};
+      dir = pos - 1;
+      dir_check = dir % this.size;
+      if (dir_check === this.size - 1 || dir_check < 0) {
+        surroundings.left = null;
+      } else {
+        surroundings.left = dir;
+      }
+      dir = pos + 1;
+      dir_check = dir % this.size;
+      if (dir_check === 0 || dir_check > this.size) {
+        surroundings.right = null;
+      } else {
+        surroundings.right = dir;
+      }
+      dir = pos - this.size;
+      if (dir < 0) {
+        surroundings.up = null;
+      } else {
+        surroundings.up = dir;
+      }
+      dir = pos + this.size;
+      if (dir > Math.pow(this.size, 2)) {
+        surroundings.down = null;
+      } else {
+        surroundings.down = dir;
+      }
+      return surroundings;
+    };
+
+    Board.prototype.get_connected_stones = function(pos) {
+      var dir, dir_pos, group, player, stack, surroundings;
+      group = [pos];
+      player = this.get_player(pos);
+      stack = [pos];
+      while (stack.length > 0) {
+        pos = stack.pop();
+        surroundings = this.get_surroundings(pos);
+        for (dir in surroundings) {
+          dir_pos = surroundings[dir];
+          if (dir_pos !== null && this.get_player(dir_pos) === player && __indexOf.call(group, dir_pos) < 0) {
+            group.push(dir_pos);
+            stack.push(dir_pos);
+          }
+        }
+      }
+      return group;
+    };
+
     return Board;
 
   })();
 
   this.Board = Board;
+
+  b = new Board(document.getElementById("board"), 6);
+
+  player = 1;
+
+  b.register(function(pos) {
+    console.log("Clicked! ->", pos);
+    if (player === 1) {
+      player = 2;
+    } else {
+      player = 1;
+    }
+    b.place(pos, player);
+    return console.log("Group", b.get_connected_stones(pos));
+  });
+
+  b.place(9, 1);
+
+  b.place(15, 1);
+
+  b.place(18, 1);
+
+  b.place(19, 1);
+
+  b.place(20, 1);
+
+  b.place(21, 1);
 
 }).call(this);
