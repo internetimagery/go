@@ -32,9 +32,8 @@ play_stone = (player, pos, board)->
     board.place(pos, 0) # Undo placement
     throw "Placement Failed: Position is Suicide."
 
-  console.log "Placed stone at position #{pos}."
+  console.log "Placed stone at position #{pos}.", board.get_surroundings(pos)
   return board.dump_state()
-
 
 
 # Lets go!
@@ -44,8 +43,8 @@ main = ()->
   # TODO: Add warning popup if gamedata throws error, and try/catch block here
   game_data = get_game_data() # URL parsed information
   game_states = [] # Record the state of the board
-  board_element = document.getElementById("board") # Where to place the board
   current_turn = 0 # Where we are currently
+  board = new Board(document.getElementById("board"), game_data.board_size)
 
   if game_data.board_size == 0
     console.log "!! NEW GAME !!"
@@ -54,19 +53,16 @@ main = ()->
   else
     console.log "!! LOADING GAME !!"
     # TODO: Add the ability to traverse game states
-    # TODO: Add game rule verification
-    board = new Board(board_element, game_data.board_size)
-    board.register (pos)->
-      play_stone(2, pos, board)
-
     for move in game_data.moves
       state = play_stone(game_states.length % 2 + 1, move, board)
       game_states.push(state)
     current_turn = game_states.length
 
+  # Allow the player to place stones!
+  board.register (pos)->
+    play_stone(current_turn % 2 + 1, pos, board)
 
 
-  console.log game_data
 
 
 main()

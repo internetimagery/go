@@ -25,7 +25,7 @@ class Board
 
     # Size some things proportionate to the board size
     grid_chunk = 100 / (@size - 1) # Space between grids
-    stone_size = grid_chunk * 1
+    stone_size = grid_chunk * 0.8
 
     # Create an inner frame, smaller than the board, so our stones don't fall off the sides
     inner = Create("grid", element)
@@ -111,7 +111,7 @@ class Board
       surroundings.up = dir
     # DOWN
     dir = pos + @size
-    if dir <= (@size - 1) ** 2
+    if dir < @size ** 2
       surroundings.down = dir
     return surroundings
 

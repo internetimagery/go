@@ -25,7 +25,7 @@
         throw "Board size not big enough.";
       }
       grid_chunk = 100 / (this.size - 1);
-      stone_size = grid_chunk * 1;
+      stone_size = grid_chunk * 0.8;
       inner = Create("grid", element);
       inner_frame_pos = stone_size * 0.6;
       inner_frame_span = 100 - inner_frame_pos * 2;
@@ -131,7 +131,7 @@
         surroundings.up = dir;
       }
       dir = pos + this.size;
-      if (dir <= Math.pow(this.size - 1, 2)) {
+      if (dir < Math.pow(this.size, 2)) {
         surroundings.down = dir;
       }
       return surroundings;
