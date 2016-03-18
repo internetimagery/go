@@ -18,7 +18,7 @@
 Get_Game_Data = ()->
   game_data =
     board_size: 0
-    moves: Array()
+    moves: []
 
   # Gather current information to generate state data
   url = document.createElement("a") # Temp link to leverage DOM parsing
@@ -29,7 +29,7 @@ Get_Game_Data = ()->
   if 1 < data.length # Check we have something. Discarding the hash
     console.log "Game Data found. Validating..."
 
-    if data.length < 5 # Check we have a board size and at least one move
+    if data.length < 3 # Check we have a board size (and hash)
       throw "Invalid Game Data"
 
     game_data.board_size = parseInt(data.substring(1, 3)) # Pull out our board size

@@ -5,14 +5,14 @@
     var cell_num, chunk, data, game_data, i, turn_data, url, _i, _ref;
     game_data = {
       board_size: 0,
-      moves: Array()
+      moves: []
     };
     url = document.createElement("a");
     url.href = window.location.href;
     data = url.hash;
     if (1 < data.length) {
       console.log("Game Data found. Validating...");
-      if (data.length < 5) {
+      if (data.length < 3) {
         throw "Invalid Game Data";
       }
       game_data.board_size = parseInt(data.substring(1, 3));

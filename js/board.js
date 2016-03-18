@@ -19,8 +19,8 @@
     function Board(element, size) {
       var col, grid_chunk, inner, inner_frame_pos, inner_frame_span, row, socket, stone_size, _fn, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
       this.size = size;
-      this.callbacks = Array();
-      this.stone_class = Array("empty", "stone set white", "stone set black");
+      this.callbacks = [];
+      this.stone_class = ["empty", "stone set white", "stone set black"];
       if (this.size < 2) {
         throw "Board size not big enough.";
       }
@@ -37,7 +37,7 @@
       for (col = _j = 0, _ref1 = this.size; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; col = 0 <= _ref1 ? ++_j : --_j) {
         Create("line-vert", inner).setAttribute("style", "left:" + (col * grid_chunk) + "%;");
       }
-      this.sockets = Array();
+      this.sockets = [];
       for (col = _k = 0, _ref2 = this.size; 0 <= _ref2 ? _k < _ref2 : _k > _ref2; col = 0 <= _ref2 ? ++_k : --_k) {
         _fn = (function(_this) {
           return function() {
@@ -79,6 +79,27 @@
       }
       this.sockets[pos].setAttribute("class", this.stone_class[stone]);
       return this.sockets[pos].player = stone;
+    };
+
+    Board.prototype.dump_state = function() {
+      var pos, state, _i, _ref;
+      state = [];
+      for (pos = _i = 0, _ref = this.sockets.length; 0 <= _ref ? _i < _ref : _i > _ref; pos = 0 <= _ref ? ++_i : --_i) {
+        state.push(this.sockets[pos].player);
+      }
+      return state;
+    };
+
+    Board.prototype.load_state = function(state) {
+      var pos, _i, _ref, _results;
+      if (state.length !== this.size) {
+        throw "Invalid State Size";
+      }
+      _results = [];
+      for (pos = _i = 0, _ref = state.length; 0 <= _ref ? _i < _ref : _i > _ref; pos = 0 <= _ref ? ++_i : --_i) {
+        _results.push(this.place(pos, state[pos]));
+      }
+      return _results;
     };
 
     Board.prototype.get_player = function(pos) {
@@ -141,7 +162,7 @@
 
     Board.prototype.get_liberties = function(group) {
       var dir, dir_pos, liberties, pos, _i, _len, _ref;
-      liberties = Array();
+      liberties = [];
       for (_i = 0, _len = group.length; _i < _len; _i++) {
         pos = group[_i];
         _ref = this.get_surroundings(pos);

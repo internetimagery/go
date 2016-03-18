@@ -14,12 +14,12 @@ Create = (name, parent)->
 
 class Board
   constructor: (element, @size) ->
-    @callbacks = Array()
-    @stone_class = Array(
-      "empty",
-      "stone set white",
+    @callbacks = []
+    @stone_class = [
+      "empty", # Completely empty
+      "stone set white", # White stone on board
       "stone set black"
-      )
+    ]
     if @size < 2
       throw "Board size not big enough."
 
@@ -41,7 +41,7 @@ class Board
       Create("line-vert", inner).setAttribute("style", "left:#{col * grid_chunk}%;")
 
     # Add placeholder positions to place stones
-    @sockets = Array()
+    @sockets = []
     for col in [0 ... @size]
       for row in [0 ... @size]
         socket = Create("empty", inner)
@@ -68,6 +68,20 @@ class Board
       throw "Requested position not within board size."
     @sockets[pos].setAttribute("class", @stone_class[stone])
     @sockets[pos].player = stone
+
+  # Dump the state of the board. Positions and players
+  dump_state: ()->
+    state = []
+    for pos in [0 ... @sockets.length]
+      state.push(@sockets[pos].player)
+    return state
+
+  # Load up a state to the board
+  load_state: (state)->
+    if state.length != @size
+      throw "Invalid State Size"
+    for pos in [0 ... state.length]
+      @place(pos, state[pos])
 
   # UTILITY
 
@@ -124,7 +138,7 @@ class Board
 
   # Get the liberties of a group
   get_liberties: (group)->
-    liberties = Array()
+    liberties = []
     for pos in group
       for dir, dir_pos of @get_surroundings(pos)
         if dir_pos != null and @get_player(dir_pos) == 0 # Check for empty fields
