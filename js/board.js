@@ -37,7 +37,7 @@
         Create("line-vert", inner).setAttribute("style", "left:" + (col * grid_chunk) + "%;");
       }
       this.sockets = Array();
-      for (row = _k = 0, _ref2 = this.size; 0 <= _ref2 ? _k < _ref2 : _k > _ref2; row = 0 <= _ref2 ? ++_k : --_k) {
+      for (col = _k = 0, _ref2 = this.size; 0 <= _ref2 ? _k < _ref2 : _k > _ref2; col = 0 <= _ref2 ? ++_k : --_k) {
         _fn = (function(_this) {
           return function() {
             var pos;
@@ -47,7 +47,7 @@
             };
           };
         })(this);
-        for (col = _l = 0, _ref3 = this.size; 0 <= _ref3 ? _l < _ref3 : _l > _ref3; col = 0 <= _ref3 ? ++_l : --_l) {
+        for (row = _l = 0, _ref3 = this.size; 0 <= _ref3 ? _l < _ref3 : _l > _ref3; row = 0 <= _ref3 ? ++_l : --_l) {
           socket = Create("empty", inner);
           socket.player = 0;
           socket.resize(row * grid_chunk - stone_size * 0.5, col * grid_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;");

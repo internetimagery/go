@@ -40,20 +40,42 @@ get_surroundings = (pos, size)->
     surroundings.down = dir
   return surroundings
 
-# Get player at a given position. Empty = 0, White = 1, Black = 2
-get_player_at_pos = (pos, board)->
-  console.log "TODO: MAKE THIS WORK"
-  return 1 # TEMP returning black always
-
 # Walk through all stones connected together and put into an array.
 get_connected_stones = (pos, board, size)->
-  group = Array(pos)
+  group = []
+  player = board.get_player(pos) # Get the player we're tracking
+  stack = [pos]
+
+  # while stack.length > 0
+  pos = stack.pop()
   surroundings = get_surroundings(pos, size)
-  console.log surroundings.left is null
+  # for dir, dir_pos of surroundings # Loop our options
+
+
+
+  #   if surroundings.left isnt null and board.get_player(surroundings.left) == player
+  #     stack.push(surroundings.left)
+  #   if surroundings.right isnt null and board.get_player(surroundings.right) == player
+  #     stack.push(surroundings.right)
+  #   if surroundings.left isnt null and board.get_player(surroundings.left) == player
+  #     stack.push(surroundings.left)
+  #   if surroundings.left isnt null and board.get_player(surroundings.left) == player
+  #     stack.push(surroundings.left)
+
 
 
 # TODO: walk connected STONES
 # TODO: get liberties of a group
 # TODO: check for ko
 
+# TESTING
+
 b = new Board(document.getElementById("board"), 6)
+b.register (pos)->
+  console.log "Clicked! ->", pos
+b.place(9, 1)
+b.place(15, 1)
+b.place(21, 1)
+b.place(20, 1)
+
+console.log get_connected_stones(9, b, 6)

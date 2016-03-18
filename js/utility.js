@@ -1,5 +1,5 @@
 (function() {
-  var b, get_connected_stones, get_player_at_pos, get_surroundings;
+  var b, get_connected_stones, get_surroundings;
 
   get_surroundings = function(pos, size) {
     var dir, dir_check, surroundings;
@@ -33,18 +33,29 @@
     return surroundings;
   };
 
-  get_player_at_pos = function(pos, board) {
-    console.log("TODO: MAKE THIS WORK");
-    return 1;
-  };
-
   get_connected_stones = function(pos, board, size) {
-    var group, surroundings;
-    group = Array(pos);
-    surroundings = get_surroundings(pos, size);
-    return console.log(surroundings.left === null);
+    var group, player, stack, surroundings;
+    group = [];
+    player = board.get_player(pos);
+    stack = [pos];
+    pos = stack.pop();
+    return surroundings = get_surroundings(pos, size);
   };
 
   b = new Board(document.getElementById("board"), 6);
+
+  b.register(function(pos) {
+    return console.log("Clicked! ->", pos);
+  });
+
+  b.place(9, 1);
+
+  b.place(15, 1);
+
+  b.place(21, 1);
+
+  b.place(20, 1);
+
+  console.log(get_connected_stones(9, b, 6));
 
 }).call(this);

@@ -42,8 +42,8 @@ class Board
 
     # Add placeholder positions to place stones
     @sockets = Array()
-    for row in [0 ... @size]
-      for col in [0 ... @size]
+    for col in [0 ... @size]
+      for row in [0 ... @size]
         socket = Create("empty", inner)
         socket.player = 0
         socket.resize(row * grid_chunk - stone_size * 0.5, col * grid_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;")
