@@ -4,6 +4,18 @@
 #05001002005008007012011
 #05---001002005008007012011---004006
 
+# TODO: ko check
+# TODO: errors as alert popups
+# TODO: alternate turns
+# TODO: add game mode bit to front of protocol
+# TODO: change hard limit of 650 turns to warnings
+# TODO: add default "009" to url if no board is specified
+# TODO: keep game state separate to board state, and sync the two with a "draw" function
+# TODO: look into adding some animations
+# TODO: add gnugpg signing option to url for authenticity "https://openpgpjs.org/"
+# TODO: google style diagonal lined background to board
+# TODO: make board size work nicely on desktop and mobile
+
 # Capture a group
 capture = (stone, board)->
   if board.get_player(stone) != 0 # Check in case another loop already captured this group
@@ -22,9 +34,15 @@ play_stone = (player, pos, board, last_move)->
   board.place(pos, player)
 
   # Check if we can capture anything
+  check_ko = false
   for dir, stone of board.get_surroundings(pos)
     if board.is_surrounded(stone) # Found one!
       capture(stone, board) # Take it!
+      check_ko = true
+
+  # Check for an illegal ko
+  if check_ko
+    console.log "checking ko"
 
   # TODO: Check if capturing created a KO
 

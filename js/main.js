@@ -14,17 +14,22 @@
   };
 
   play_stone = function(player, pos, board, last_move) {
-    var dir, stone, _ref;
+    var check_ko, dir, stone, _ref;
     if (board.get_player(pos) !== 0) {
       throw "Placement Failed: Stone is already there.";
     }
     board.place(pos, player);
+    check_ko = false;
     _ref = board.get_surroundings(pos);
     for (dir in _ref) {
       stone = _ref[dir];
       if (board.is_surrounded(stone)) {
         capture(stone, board);
+        check_ko = true;
       }
+    }
+    if (check_ko) {
+      console.log("checking ko");
     }
     if (board.is_surrounded(pos)) {
       board.place(pos, 0);
