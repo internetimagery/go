@@ -20,12 +20,20 @@
   # - Game mode 0
   # - Board size 9
 
+class Game_Data
+  constructor: ()->
+    @mode = 0 # Game mode
+    @board_size = 9 # Size of one edge of a square board
+    @moves = [] # Moves played
+    @current = 0 # Current viewing position of game
+  get_id: ()-> # Get ID that represents game so far.
+    size = "00#{@board_size}"[-2 ..]
+    moves = ("000#{move}"[-3 ..] for move in @moves).join("")
+    return @mode + size + moves
+
 # Game Data Representation
 Get_Game_Data = ()->
-  game_data =
-    mode: 0
-    board_size: 9
-    moves: []
+  game_data = new Game_Data()
 
   # Gather current information to generate state data
   url = document.createElement("a") # Temp link to leverage DOM parsing
@@ -63,12 +71,15 @@ Get_Game_Data = ()->
           throw "Invalid Turn @ #{chunk / 3}."
         else
           game_data.moves.push(chunk_data)
+    game_data.current = game_data.moves.length # Current position
     console.log "Valid!"
   else
     console.log "No game data found. Using defaults. Game mode 0. Board size 9."
     # Update URL to match defaults
     tmp_url = window.location.href.split("#")
     window.location.href = "#{tmp_url[0]}#009"
+
+  console.log game_data.get_id()
   return game_data
 
 # Export Function

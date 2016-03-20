@@ -1,13 +1,37 @@
 (function() {
-  var Get_Game_Data;
+  var Game_Data, Get_Game_Data;
+
+  Game_Data = (function() {
+    function Game_Data() {
+      this.mode = 0;
+      this.board_size = 9;
+      this.moves = [];
+      this.current = 0;
+    }
+
+    Game_Data.prototype.get_id = function() {
+      var move, moves, size;
+      size = ("00" + this.board_size).slice(-2);
+      moves = ((function() {
+        var _i, _len, _ref, _results;
+        _ref = this.moves;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          move = _ref[_i];
+          _results.push(("000" + move).slice(-3));
+        }
+        return _results;
+      }).call(this)).join("");
+      return this.mode + size + moves;
+    };
+
+    return Game_Data;
+
+  })();
 
   Get_Game_Data = function() {
     var cell_num, chunk, chunk_data, data, game_data, tmp_url, url, _i, _ref;
-    game_data = {
-      mode: 0,
-      board_size: 9,
-      moves: []
-    };
+    game_data = new Game_Data();
     url = document.createElement("a");
     url.href = window.location.href;
     data = url.hash;
@@ -43,12 +67,14 @@
           }
         }
       }
+      game_data.current = game_data.moves.length;
       console.log("Valid!");
     } else {
       console.log("No game data found. Using defaults. Game mode 0. Board size 9.");
       tmp_url = window.location.href.split("#");
       window.location.href = "" + tmp_url[0] + "#009";
     }
+    console.log(game_data.get_id());
     return game_data;
   };
 
