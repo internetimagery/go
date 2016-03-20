@@ -4,9 +4,10 @@
 
 # RULES
   # - Enforce a limit of 2000 characters to the URL.
-  # - Subtract 50 characters for use in domain / host / page / etc.
+  # - Assume 50 characters for use in domain / host / page / etc.
   # - All digits and dashes, following a hash.
-  # - First two digits refer to board size.
+  # - First digit referse to game type. 10 potential options.
+  # - Next two digits refer to board size.
   # - Board size limit is 2 - 31.
   # - Split the following digits into chunks of 3. Chunks represent a turn each.
   # - Turns in chronilogical order
@@ -15,10 +16,15 @@
   # - Number of turns and current game state can be determined by looking at the history
   # - Current player can be determined by turn number
 
+# DEFAULTS
+  # - Game mode 0
+  # - Board size 9
+
 # Game Data Representation
 Get_Game_Data = ()->
   game_data =
-    board_size: 0
+    mode: 0
+    board_size: 9
     moves: []
 
   # Gather current information to generate state data
@@ -26,39 +32,43 @@ Get_Game_Data = ()->
   url.href = window.location.href # Pass in current URL
   data = url.hash # URL data
 
-  # Validate technical issues in data
+  # Validate possible technical issues in data
   if 1 < data.length # Check we have something. Discarding the hash
     console.log "Game Data found. Validating..."
+    data = data.substring(1) # Chop off the hash
 
-    if data.length < 3 # Check we have a board size (and hash)
-      throw "Invalid Game Data"
+    if data.length % 3 != 0 # Check our data fits into even chunks
+      throw "Possible corrupt game data..."
 
-    game_data.board_size = parseInt(data.substring(1, 3)) # Pull out our board size
+    if data.length / 3 > 649 # Check for turn limit
+      console.warn "Turn limit of 649 exceeded. Urls may not work on some browsers."
+
+    game_data.mode = parseInt(data[0]) # Get game mode
+    if isNaN(game_data.mode)
+      throw "Invalid Game Mode"
+
+    game_data.board_size = parseInt(data[1 .. 2]) # Get board size
     if isNaN(game_data.board_size) or game_data.board_size < 2 or game_data.board_size > 31 # Validate its size
       throw "Invalid Board Size. Sizes must be between 2 and 31."
 
-    turn_data = data.substring(3) # Take the remaining data
-    if turn_data.length % 3 != 0 # Check we have turns in threes
-      throw "Invalid Turn Data"
-
-    cell_num = game_data.board_size ** 2 # Number of cells in the board.
-    for i in [0 ... turn_data.length / 3] # Chunk the data
-      i *= 3
-      chunk = turn_data.substring(i, i + 3)
-      if chunk == "---" # Special case. A Pass.
-        game_data.moves.push(chunk)
+    cell_num = game_data.board_size ** 2 # Number of cells in board (square)
+    for chunk in [1 ... data.length / 3]
+      chunk *= 3
+      chunk_data = data[chunk ... chunk + 3]
+      if chunk_data == "---" # Special case. We have a "PASS"
+        game_data.moves.push(chunk_data)
       else
-        chunk = parseInt(chunk)
-        if isNaN(chunk) or chunk > cell_num # Check the move can fit on the board
-          throw "Invalid Turn #{i / 3 + 1}."
-        game_data.moves.push(chunk) # Add turn to our list
-
-    if game_data.moves.length > 650 # Turn limit. Soft limit. Can go over for some browsers.
-      console.warn "Turns exceeded turn limit of 650. Games may not be recorded accurately!"
-
+        chunk_data = parseInt(chunk_data)
+        if isNaN(chunk_data) or chunk_data > cell_num
+          throw "Invalid Turn @ #{chunk / 3}."
+        else
+          game_data.moves.push(chunk_data)
     console.log "Valid!"
   else
-    console.log "No Game Data found."
+    console.log "No game data found. Using defaults. Game mode 0. Board size 9."
+    # Update URL to match defaults
+    tmp_url = window.location.href.split("#")
+    window.location.href = "#{tmp_url[0]}#009"
   return game_data
 
 # Export Function

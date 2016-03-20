@@ -8,7 +8,6 @@
 # TODO: alternate turns
 # TODO: add game mode bit to front of protocol
 # TODO: add default "009" to url if no board is specified
-# TODO: keep game state separate to board state, and sync the two with a "draw" function
 # TODO: look into adding some animations
 # TODO: add gnugpg signing option to url for authenticity "https://openpgpjs.org/"
 # TODO: google style diagonal lined background to board
@@ -21,7 +20,7 @@ capture = (stone, board)->
     for stone in group
       board.place(stone, 0)
 
-# Play a stone!
+# Play a stone! Validate game rules!
 play_stone = (player, pos, board, ko_check_move)->
   # Validate Placement
   if board.get_player(pos) != 0 # There is a stone already there
