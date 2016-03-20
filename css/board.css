@@ -64,13 +64,6 @@ body {
   background-color: rgb(60, 60, 60);;
 }
 
-.empty:hover {
-  background-image: radial-gradient(
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 255, 0) 50.1%
-    );
-}
-
 .empty-white:hover {
   background-image: radial-gradient(
     rgba(255, 255, 255, 1) 50%,

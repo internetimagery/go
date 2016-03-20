@@ -20,7 +20,7 @@
       var col, grid_chunk, inner, inner_frame_pos, inner_frame_span, row, socket, stone_size, _fn, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
       this.size = size;
       this.callbacks = [];
-      this.stone_class = ["empty", "stone set white", "stone set black"];
+      this.stone_class = ["empty", "stone set white", "stone set black", "empty-white", "empty-black"];
       this.board_state = [];
       if (this.size < 2) {
         throw "Board size not big enough.";
@@ -93,13 +93,16 @@
       return this.board_state = state.slice(0);
     };
 
-    Board.prototype.update = function() {
+    Board.prototype.update = function(player) {
       var pos, _i, _ref, _results;
       _results = [];
       for (pos = _i = 0, _ref = this.sockets.length; 0 <= _ref ? _i < _ref : _i > _ref; pos = 0 <= _ref ? ++_i : --_i) {
         if (this.board_state[pos] !== this.sockets[pos].player) {
           this.sockets[pos].setAttribute("class", this.stone_class[this.board_state[pos]]);
-          _results.push(this.sockets[pos].player = this.board_state[pos]);
+          this.sockets[pos].player = this.board_state[pos];
+        }
+        if (this.sockets[pos].player === 0) {
+          _results.push(this.sockets[pos].setAttribute("class", this.stone_class[player + 2]));
         } else {
           _results.push(void 0);
         }

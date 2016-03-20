@@ -76,7 +76,7 @@
       }
     }
     game_data.current = game_states.length;
-    board.update();
+    board.update(game_states.length % 2 + 1);
     board.register(function(pos) {
       var current_state, error;
       if (game_data.current === game_states.length) {
@@ -104,7 +104,7 @@
         game_data.current = Math.floor(new_hash[1].length / 3) - 1;
         view_state = game_states[game_data.current - 1];
         board.load_state(view_state);
-        return board.update();
+        return board.update(game_data.current % 2 + 1);
       }
     };
   };

@@ -18,7 +18,9 @@ class Board
     @stone_class = [
       "empty", # Completely empty
       "stone set white", # White stone on board
-      "stone set black"
+      "stone set black",
+      "empty-white", # Empty hover pieces
+      "empty-black"
     ]
     @board_state = []
     if @size < 2
@@ -81,11 +83,13 @@ class Board
     @board_state = state[..] # replace our state with new one
 
   # Update board to current state.
-  update: ()->
+  update: (player)->
     for pos in [0 ... @sockets.length]
       if @board_state[pos] != @sockets[pos].player # Check for differences in setup
         @sockets[pos].setAttribute("class", @stone_class[@board_state[pos]])
         @sockets[pos].player = @board_state[pos]
+      if @sockets[pos].player == 0
+        @sockets[pos].setAttribute("class", @stone_class[player + 2])
 
   # UTILITY
 

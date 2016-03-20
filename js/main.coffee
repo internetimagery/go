@@ -80,7 +80,7 @@ main = ()->
       state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1])
       game_states.push(state)
   game_data.current = game_states.length
-  board.update() # Update board visuals
+  board.update(game_states.length % 2 + 1) # Update board visuals
 
   # Allow the player to place stones!
   board.register (pos)->
@@ -106,7 +106,7 @@ main = ()->
       game_data.current = new_hash[1].length // 3 - 1
       view_state = game_states[game_data.current - 1]
       board.load_state(view_state)
-      board.update()
+      board.update(game_data.current % 2 + 1)
 
 
 
