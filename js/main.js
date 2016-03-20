@@ -36,7 +36,6 @@
       for (i = _i = 0, _ref1 = new_state.length; 0 <= _ref1 ? _i < _ref1 : _i > _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
         if (new_state[i] !== ko_check_move[i]) {
           ko = false;
-          console.log(i, new_state[i], ko_check_move[i]);
           break;
         }
       }
@@ -49,7 +48,8 @@
       board.load_state(state_backup);
       throw "Illegal Move: Suicide.";
     }
-    return board.dump_state();
+    board.update();
+    return new_state;
   };
 
   main = function() {

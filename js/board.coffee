@@ -20,6 +20,7 @@ class Board
       "stone set white", # White stone on board
       "stone set black"
     ]
+    @board_state = []
     if @size < 2
       throw "Board size not big enough."
 
@@ -52,6 +53,7 @@ class Board
           socket.onclick = (event)=>
             @placement_event(pos)
         @sockets.push(socket)
+        @board_state.push(0)
 
   # Register callback for placement events
   register: (func)->
@@ -66,23 +68,24 @@ class Board
   place: (pos, stone)->
     if pos > @size ** 2
       throw "Requested position not within board size."
-    @sockets[pos].setAttribute("class", @stone_class[stone])
-    @sockets[pos].player = stone
+    @board_state[pos] = stone
 
   # Dump the state of the board. Positions and players
   dump_state: ()->
-    state = []
-    for pos in [0 ... @sockets.length]
-      state.push(@sockets[pos].player)
-    return state
+    return @board_state[..] # Copy to not modify original
 
   # Load up a state to the board
   load_state: (state)->
     if state.length != @size ** 2
       throw "Invalid State Size"
-    for pos in [0 ... state.length]
-      if @get_player(pos) != state[pos]
-        @place(pos, state[pos])
+    @board_state = state[..] # replace our state with new one
+
+  # Update board to current state.
+  update: ()->
+    for pos in [0 ... @sockets.length]
+      if @board_state[pos] != @sockets[pos].player # Check for differences in setup
+        @sockets[pos].setAttribute("class", @stone_class[@board_state[pos]])
+        @sockets[pos].player = @board_state[pos]
 
   # UTILITY
 
@@ -90,7 +93,7 @@ class Board
   get_player: (pos)->
     if pos > @size ** 2
       throw "Requested position not within board size."
-    return @sockets[pos].player
+    return @board_state[pos]
 
   # Get surrounding locations of a stone
   get_surroundings: (pos)->

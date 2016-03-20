@@ -21,6 +21,7 @@
       this.size = size;
       this.callbacks = [];
       this.stone_class = ["empty", "stone set white", "stone set black"];
+      this.board_state = [];
       if (this.size < 2) {
         throw "Board size not big enough.";
       }
@@ -54,6 +55,7 @@
           socket.resize(row * grid_chunk - stone_size * 0.5, col * grid_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;");
           _fn();
           this.sockets.push(socket);
+          this.board_state.push(0);
         }
       }
     }
@@ -77,28 +79,27 @@
       if (pos > Math.pow(this.size, 2)) {
         throw "Requested position not within board size.";
       }
-      this.sockets[pos].setAttribute("class", this.stone_class[stone]);
-      return this.sockets[pos].player = stone;
+      return this.board_state[pos] = stone;
     };
 
     Board.prototype.dump_state = function() {
-      var pos, state, _i, _ref;
-      state = [];
-      for (pos = _i = 0, _ref = this.sockets.length; 0 <= _ref ? _i < _ref : _i > _ref; pos = 0 <= _ref ? ++_i : --_i) {
-        state.push(this.sockets[pos].player);
-      }
-      return state;
+      return this.board_state.slice(0);
     };
 
     Board.prototype.load_state = function(state) {
-      var pos, _i, _ref, _results;
       if (state.length !== Math.pow(this.size, 2)) {
         throw "Invalid State Size";
       }
+      return this.board_state = state.slice(0);
+    };
+
+    Board.prototype.update = function() {
+      var pos, _i, _ref, _results;
       _results = [];
-      for (pos = _i = 0, _ref = state.length; 0 <= _ref ? _i < _ref : _i > _ref; pos = 0 <= _ref ? ++_i : --_i) {
-        if (this.get_player(pos) !== state[pos]) {
-          _results.push(this.place(pos, state[pos]));
+      for (pos = _i = 0, _ref = this.sockets.length; 0 <= _ref ? _i < _ref : _i > _ref; pos = 0 <= _ref ? ++_i : --_i) {
+        if (this.board_state[pos] !== this.sockets[pos].player) {
+          this.sockets[pos].setAttribute("class", this.stone_class[this.board_state[pos]]);
+          _results.push(this.sockets[pos].player = this.board_state[pos]);
         } else {
           _results.push(void 0);
         }
@@ -110,7 +111,7 @@
       if (pos > Math.pow(this.size, 2)) {
         throw "Requested position not within board size.";
       }
-      return this.sockets[pos].player;
+      return this.board_state[pos];
     };
 
     Board.prototype.get_surroundings = function(pos) {

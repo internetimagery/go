@@ -47,7 +47,6 @@ play_stone = (player, pos, board, ko_check_move)->
     for i in [0 ... new_state.length]
       if new_state[i] != ko_check_move[i] # Only one cell needs to not match to break out of Ko
         ko = false
-        console.log i, new_state[i], ko_check_move[i]
         break
     if ko
       board.load_state(state_backup)
@@ -58,9 +57,9 @@ play_stone = (player, pos, board, ko_check_move)->
     board.load_state(state_backup) # last_move cannot be undefined as you cannot be surrounded on first move
     throw "Illegal Move: Suicide."
 
-  # console.log "Placed stone at position #{pos}.", board.get_surroundings(pos)
-  return board.dump_state()
-
+  # Update our board with the new move and return the new state
+  board.update()
+  return new_state
 
 # Lets go!
 main = ()->
