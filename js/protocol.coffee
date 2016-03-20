@@ -11,7 +11,7 @@
   # - Split the following digits into chunks of 3. Chunks represent a turn each.
   # - Turns in chronilogical order
   # - Chunks are board positions or three dashes is a pass
-  # - Turn limit of 650
+  # - Turn limit of 649
   # - Number of turns and current game state can be determined by looking at the history
   # - Current player can be determined by turn number
 
@@ -53,8 +53,8 @@ Get_Game_Data = ()->
           throw "Invalid Turn #{i / 3 + 1}."
         game_data.moves.push(chunk) # Add turn to our list
 
-    if game_data.moves.length > 650 # Turn limit.
-      throw "Turns exceeded turn limit of 650."
+    if game_data.moves.length > 650 # Turn limit. Soft limit. Can go over for some browsers.
+      console.warn "Turns exceeded turn limit of 650. Games may not be recorded accurately!"
 
     console.log "Valid!"
   else

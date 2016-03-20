@@ -92,7 +92,7 @@
 
     Board.prototype.load_state = function(state) {
       var pos, _i, _ref, _results;
-      if (state.length !== this.size) {
+      if (state.length !== Math.pow(this.size, 2)) {
         throw "Invalid State Size";
       }
       _results = [];
@@ -164,7 +164,7 @@
         _ref = this.get_surroundings(pos);
         for (dir in _ref) {
           dir_pos = _ref[dir];
-          if (this.get_player(dir_pos) === 0) {
+          if (this.get_player(dir_pos) === 0 && __indexOf.call(liberties, dir_pos) < 0) {
             liberties.push(dir_pos);
           }
         }
@@ -173,14 +173,18 @@
     };
 
     Board.prototype.is_surrounded = function(pos) {
-      var group, liberties;
-      group = this.get_connected_stones(pos);
-      liberties = this.get_liberties(group);
-      if (liberties.length > 0) {
-        return false;
-      } else {
-        return true;
+      var group, liberties, player;
+      player = this.get_player(pos);
+      if (player !== 0) {
+        group = this.get_connected_stones(pos);
+        liberties = this.get_liberties(group);
+        if (liberties.length > 0) {
+          return false;
+        } else {
+          return true;
+        }
       }
+      return false;
     };
 
     return Board;

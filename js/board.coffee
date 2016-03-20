@@ -78,7 +78,7 @@ class Board
 
   # Load up a state to the board
   load_state: (state)->
-    if state.length != @size
+    if state.length != @size ** 2
       throw "Invalid State Size"
     for pos in [0 ... state.length]
       if @get_player(pos) != state[pos]
@@ -134,16 +134,18 @@ class Board
     liberties = []
     for pos in group
       for dir, dir_pos of @get_surroundings(pos)
-        if @get_player(dir_pos) == 0 # Check for empty fields
+        if @get_player(dir_pos) == 0 and dir_pos not in liberties # Check for empty fields
           liberties.push(dir_pos)
     return liberties
 
   # Check if stone is captured
   is_surrounded: (pos)->
-    group = @get_connected_stones(pos)
-    liberties = @get_liberties(group)
-    return if liberties.length > 0 then false else true
-
+    player = @get_player(pos)
+    if player != 0 # Empty spaces are always surrounded. :o
+      group = @get_connected_stones(pos)
+      liberties = @get_liberties(group)
+      return if liberties.length > 0 then false else true
+    return false
 
 # Export Class
 this.Board = Board

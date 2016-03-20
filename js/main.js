@@ -2,22 +2,24 @@
   var capture, main, play_stone;
 
   capture = function(stone, board) {
-    var group, _i, _len;
+    var group, _i, _len, _results;
     if (board.get_player(stone) !== 0) {
       group = board.get_connected_stones(stone);
+      _results = [];
       for (_i = 0, _len = group.length; _i < _len; _i++) {
         stone = group[_i];
-        board.place(stone, 0);
+        _results.push(board.place(stone, 0));
       }
-      return console.log("Capturing group");
+      return _results;
     }
   };
 
-  play_stone = function(player, pos, board, last_move) {
-    var check_ko, dir, stone, _ref;
+  play_stone = function(player, pos, board, ko_check_move) {
+    var check_ko, dir, i, ko, new_state, state_backup, stone, _i, _ref, _ref1;
     if (board.get_player(pos) !== 0) {
-      throw "Placement Failed: Stone is already there.";
+      throw "Illegal Move: Space occupied.";
     }
+    state_backup = board.dump_state();
     board.place(pos, player);
     check_ko = false;
     _ref = board.get_surroundings(pos);
@@ -28,12 +30,24 @@
         check_ko = true;
       }
     }
-    if (check_ko) {
-      console.log("checking ko");
+    new_state = board.dump_state();
+    if (check_ko && ko_check_move) {
+      ko = true;
+      for (i = _i = 0, _ref1 = new_state.length; 0 <= _ref1 ? _i < _ref1 : _i > _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
+        if (new_state[i] !== ko_check_move[i]) {
+          ko = false;
+          console.log(i, new_state[i], ko_check_move[i]);
+          break;
+        }
+      }
+      if (ko) {
+        board.load_state(state_backup);
+        throw "Illegal Move: Ko.";
+      }
     }
     if (board.is_surrounded(pos)) {
-      board.place(pos, 0);
-      throw "Placement Failed: Position is Suicide.";
+      board.load_state(state_backup);
+      throw "Illegal Move: Suicide.";
     }
     return board.dump_state();
   };
@@ -52,7 +66,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         move = _ref[_i];
         if (move === "---") {
-          game_states.push(game_states[game_states.length - 1]);
+          game_states.push(game_states[game_states.length - 2]);
         } else {
           state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1]);
           game_states.push(state);
@@ -61,7 +75,7 @@
       current_turn = game_states.length;
     }
     return board.register(function(pos) {
-      return play_stone(current_turn % 2 + 1, pos, board);
+      return play_stone(current_turn % 2 + 1, pos, board, game_states[game_states.length - 2]);
     });
   };
 

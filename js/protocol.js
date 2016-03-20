@@ -38,7 +38,7 @@
         }
       }
       if (game_data.moves.length > 650) {
-        throw "Turns exceeded turn limit of 650.";
+        console.warn("Turns exceeded turn limit of 650. Games may not be recorded accurately!");
       }
       console.log("Valid!");
     } else {
