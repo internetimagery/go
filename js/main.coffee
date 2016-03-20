@@ -69,6 +69,7 @@ main = ()->
   # Initialize our board
   board = new Board(document.getElementById("board"), game_data.board_size)
 
+  # Load up any moves
   for move in game_data.moves
     if move == "---" # We have a pass
       if game_states.length == 0 # First entry into game states

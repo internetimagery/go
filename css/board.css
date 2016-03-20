@@ -1,5 +1,9 @@
 /*Board Stylings!*/
 
+body {
+  background-image: url("../img/struckaxiom.png");
+}
+
 /*BOARD*/
 .container {
   /*width: 800px;*/
@@ -49,7 +53,7 @@
 }
 
 .set {
-  box-shadow: 0px 2px 5px 0px black, inset -10px -10px 20px rgba(0,0,0,0.5);
+  box-shadow: 0rem 0.1rem 0.3rem 0rem black, inset -0.25rem -0.25rem 0.2rem rgba(0,0,0,0.5);
 }
 
 .white {
@@ -64,5 +68,19 @@
   background-image: radial-gradient(
     rgba(255, 255, 255, 1) 50%,
     rgba(255, 255, 255, 0) 50.1%
+    );
+}
+
+.empty-white:hover {
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0) 50.1%
+    );
+}
+
+.empty-black:hover {
+  background-image: radial-gradient(
+    rgba(0, 0, 0, 1) 50%,
+    rgba(0, 0, 0, 0) 50.1%
     );
 }
