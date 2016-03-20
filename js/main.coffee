@@ -6,9 +6,11 @@
 
 # TODO: errors as alert popups
 # TODO: alternate turns
+# TODO: snapshop game state outside of place stone. revert if error from there
 # TODO: add game mode bit to front of protocol
 # TODO: add default "009" to url if no board is specified
 # TODO: look into adding some animations
+# TODO: traverse game states, and turn off stone placig in the process
 # TODO: add gnugpg signing option to url for authenticity "https://openpgpjs.org/"
 # TODO: google style diagonal lined background to board
 # TODO: make board size work nicely on desktop and mobile
@@ -27,7 +29,6 @@ play_stone = (player, pos, board, ko_check_move)->
     throw "Illegal Move: Space occupied."
 
   # Place the stone on board
-  state_backup = board.dump_state()
   board.place(pos, player)
 
   # Check if we can capture anything
@@ -48,16 +49,11 @@ play_stone = (player, pos, board, ko_check_move)->
         ko = false
         break
     if ko
-      board.load_state(state_backup)
       throw "Illegal Move: Ko."
 
   # Check if a suicide placement
   if board.is_surrounded(pos)
-    board.load_state(state_backup) # last_move cannot be undefined as you cannot be surrounded on first move
     throw "Illegal Move: Suicide."
-
-  # Update our board with the new move and return the new state
-  board.update()
   return new_state
 
 # Lets go!
@@ -66,31 +62,44 @@ main = ()->
   # Start by getting some game data
   # TODO: Add warning popup if gamedata throws error, and try/catch block here
   # TODO: Could always use alerts, probably best
-  game_data = get_game_data() # URL parsed information
-  game_states = [] # Record the state of the board
-  current_turn = 0 # Where we are currently
+  game_data = new Game_Data()
+  game_states = [] # Record the state of the game as we progress
+
+  # Parse ID from url
+  url = window.location.href.split("#")
+  if url.length == 2 and url[1] # If there is a hash we might have an ID
+    console.log "!! LOADING GAME !!"
+    game_data.read_id(url[1]) # Load game data
+  else # No data to load? Set us up at default
+    console.log "!! NEW GAME !!"
+    window.location.href = "#{url[0]}##{game_data.write_id()}"
+
+  # Initialize our board
   board = new Board(document.getElementById("board"), game_data.board_size)
 
-  if game_data.board_size == 0
-    console.log "!! NEW GAME !!"
-    # TODO: add board size creation window
-    # TODO: In hindsight this isn't required. we can link to a sized board
-
-  else
-    console.log "!! LOADING GAME !!"
-    # TODO: Add the ability to traverse game states
-    for move in game_data.moves
-      if move == "---" # Move is a pass
-        game_states.push(game_states[game_states.length - 2]) # Copy the last game state
+  for move in game_data.moves
+    if move == "---" # We have a pass
+      if game_states.length == 0 # First entry into game states
+        game_states.push(board.dump_state())
       else
-        state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1])
-        game_states.push(state)
-    current_turn = game_states.length
+        game_states.push(game_states[game_states.length - 2]) # Copy last game state
+    else
+      state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1])
+      game_states.push(state)
+  game_data.current = game_states.length
+  board.update() # Update board visuals
 
   # Allow the player to place stones!
   board.register (pos)->
-    play_stone(current_turn % 2 + 1, pos, board, game_states[game_states.length - 2])
-
+    clean_state = board.dump_state()
+    try
+      clean_state = play_stone(game_data.current % 2 + 1, pos, board, game_states[game_states.length - 2])
+      game_data.current += 1
+      game_data.add_move(pos)
+      window.location.href = "#{url[0]}##{game_data.write_id()}"
+    finally
+      board.load_state(clean_state) # This kinda doubles up. Ah well...
+      board.update() # Update board visuals
 
 
 

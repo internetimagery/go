@@ -16,71 +16,60 @@
   # - Number of turns and current game state can be determined by looking at the history
   # - Current player can be determined by turn number
 
-# DEFAULTS
-  # - Game mode 0
-  # - Board size 9
-
+# Games data represented
 class Game_Data
   constructor: ()->
     @mode = 0 # Game mode
-    @board_size = 9 # Size of one edge of a square board
+    @board_size = 9 # Size of one edge of a square board. DEFAULT 9
     @moves = [] # Moves played
     @current = 0 # Current viewing position of game
-  get_id: ()-> # Get ID that represents game so far.
+# Add a new move
+  add_move: (move)->
+    if move > @board_size ** 2
+      throw "Move is too large to fit on the board"
+    @moves.push("000#{move}"[-3 ..])
+ # Get ID that represents game virewable.
+  write_id: ()->
     size = "00#{@board_size}"[-2 ..]
     moves = ("000#{move}"[-3 ..] for move in @moves).join("")
     return @mode + size + moves
+# Load a game ID into the object
+  read_id: (id)->
+    if id.length > 0 # Check we have something.
+      console.log "Validating game data..."
 
-# Game Data Representation
-Get_Game_Data = ()->
-  game_data = new Game_Data()
+      if id.length % 3 != 0 # Check our data fits into even chunks
+        throw "Possible corrupt game data..."
 
-  # Gather current information to generate state data
-  url = document.createElement("a") # Temp link to leverage DOM parsing
-  url.href = window.location.href # Pass in current URL
-  data = url.hash # URL data
+      if id.length / 3 > 649 # Check for turn limit
+        console.warn "Turn limit of 649 exceeded. Urls may not work on some browsers."
 
-  # Validate possible technical issues in data
-  if 1 < data.length # Check we have something. Discarding the hash
-    console.log "Game Data found. Validating..."
-    data = data.substring(1) # Chop off the hash
+      mode = parseInt(id[0]) # Get game mode
+      if isNaN(mode)
+        throw "Invalid Game Mode"
 
-    if data.length % 3 != 0 # Check our data fits into even chunks
-      throw "Possible corrupt game data..."
+      board_size = parseInt(id[1 .. 2]) # Get board size
+      if isNaN(board_size) or board_size < 2 or board_size > 31 # Validate its size
+        throw "Invalid Board Size. Sizes must be between 2 and 31."
 
-    if data.length / 3 > 649 # Check for turn limit
-      console.warn "Turn limit of 649 exceeded. Urls may not work on some browsers."
-
-    game_data.mode = parseInt(data[0]) # Get game mode
-    if isNaN(game_data.mode)
-      throw "Invalid Game Mode"
-
-    game_data.board_size = parseInt(data[1 .. 2]) # Get board size
-    if isNaN(game_data.board_size) or game_data.board_size < 2 or game_data.board_size > 31 # Validate its size
-      throw "Invalid Board Size. Sizes must be between 2 and 31."
-
-    cell_num = game_data.board_size ** 2 # Number of cells in board (square)
-    for chunk in [1 ... data.length / 3]
-      chunk *= 3
-      chunk_data = data[chunk ... chunk + 3]
-      if chunk_data == "---" # Special case. We have a "PASS"
-        game_data.moves.push(chunk_data)
-      else
-        chunk_data = parseInt(chunk_data)
-        if isNaN(chunk_data) or chunk_data > cell_num
-          throw "Invalid Turn @ #{chunk / 3}."
+      cell_num = board_size ** 2 # Number of cells in board (square)
+      moves = []
+      for chunk in [1 ... id.length / 3]
+        chunk *= 3
+        chunk_data = id[chunk ... chunk + 3]
+        if chunk_data == "---" # Special case. We have a "PASS"
+          moves.push(chunk_data)
         else
-          game_data.moves.push(chunk_data)
-    game_data.current = game_data.moves.length # Current position
-    console.log "Valid!"
-  else
-    console.log "No game data found. Using defaults. Game mode 0. Board size 9."
-    # Update URL to match defaults
-    tmp_url = window.location.href.split("#")
-    window.location.href = "#{tmp_url[0]}#009"
+          chunk_data = parseInt(chunk_data)
+          if isNaN(chunk_data) or chunk_data > cell_num
+            throw "Invalid Turn @ #{chunk / 3}."
+          else
+            moves.push(chunk_data)
+      @mode = mode
+      @board_size = board_size
+      @moves = moves
+      @current = moves.length
+      console.log "Valid!"
 
-  console.log game_data.get_id()
-  return game_data
-
-# Export Function
-this.get_game_data = Get_Game_Data
+  # Export Function
+this.Game_Data = Game_Data
