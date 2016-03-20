@@ -4,13 +4,7 @@
 #05001002005008007012011
 #05---001002005008007012011---004006
 
-# TODO: errors as alert popups
-# TODO: alternate turns
-# TODO: snapshop game state outside of place stone. revert if error from there
-# TODO: add game mode bit to front of protocol
-# TODO: add default "009" to url if no board is specified
 # TODO: look into adding some animations
-# TODO: traverse game states, and turn off stone placig in the process
 # TODO: add gnugpg signing option to url for authenticity "https://openpgpjs.org/"
 # TODO: google style diagonal lined background to board
 # TODO: make board size work nicely on desktop and mobile
@@ -34,7 +28,7 @@ play_stone = (player, pos, board, ko_check_move)->
   # Check if we can capture anything
   check_ko = false
   for dir, stone of board.get_surroundings(pos)
-    if board.is_surrounded(stone) # Found one!
+    if board.get_player(stone) != player and board.is_surrounded(stone) # Found one!
       capture(stone, board) # Take it!
       check_ko = true
 
@@ -101,12 +95,15 @@ main = ()->
         alert error
       finally
         board.load_state(current_state) # This kinda doubles up. Ah well...
+    else
+      alert "Cannot add move. The game has progressed past this point."
 
   # Register dynamic changing of the board.
   window.onhashchange = ()->
     new_hash = window.location.href.split("#")
     if new_hash.length == 2 and new_hash[1].length > 3 and new_hash[1].length % 3 == 0 # Check we have a hash
-      view_state = game_states[new_hash[1].length // 3 - 2]
+      game_data.current = new_hash[1].length // 3 - 1
+      view_state = game_states[game_data.current - 1]
       board.load_state(view_state)
       board.update()
 

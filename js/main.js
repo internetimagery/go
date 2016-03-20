@@ -24,7 +24,7 @@
     _ref = board.get_surroundings(pos);
     for (dir in _ref) {
       stone = _ref[dir];
-      if (board.is_surrounded(stone)) {
+      if (board.get_player(stone) !== player && board.is_surrounded(stone)) {
         capture(stone, board);
         check_ko = true;
       }
@@ -93,13 +93,16 @@
         } finally {
           board.load_state(current_state);
         }
+      } else {
+        return alert("Cannot add move. The game has progressed past this point.");
       }
     });
     return window.onhashchange = function() {
       var new_hash, view_state;
       new_hash = window.location.href.split("#");
       if (new_hash.length === 2 && new_hash[1].length > 3 && new_hash[1].length % 3 === 0) {
-        view_state = game_states[Math.floor(new_hash[1].length / 3) - 2];
+        game_data.current = Math.floor(new_hash[1].length / 3) - 1;
+        view_state = game_states[game_data.current - 1];
         board.load_state(view_state);
         return board.update();
       }
