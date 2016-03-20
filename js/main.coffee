@@ -60,8 +60,6 @@ play_stone = (player, pos, board, ko_check_move)->
 main = ()->
 
   # Start by getting some game data
-  # TODO: Add warning popup if gamedata throws error, and try/catch block here
-  # TODO: Could always use alerts, probably best
   game_data = new Game_Data()
   game_states = [] # Record the state of the game as we progress
 
@@ -91,15 +89,26 @@ main = ()->
 
   # Allow the player to place stones!
   board.register (pos)->
-    clean_state = board.dump_state()
-    try
-      clean_state = play_stone(game_data.current % 2 + 1, pos, board, game_states[game_states.length - 2])
-      game_data.current += 1
-      game_data.add_move(pos)
-      window.location.href = "#{url[0]}##{game_data.write_id()}"
-    finally
-      board.load_state(clean_state) # This kinda doubles up. Ah well...
-      board.update() # Update board visuals
+    if game_data.current == game_states.length # Only add moves to the end of the game
+      current_state = if game_states.length == 0 then board.dump_state() else game_states[game_states.length - 1]
+      try
+        current_state = play_stone(game_data.current % 2 + 1, pos, board, game_states[game_states.length - 2])
+        game_states.push(current_state)
+        game_data.current = game_states.length
+        game_data.add_move(pos)
+        window.location.href = "#{url[0]}##{game_data.write_id()}" # Let hash-hook update for us
+      catch error
+        alert error
+      finally
+        board.load_state(current_state) # This kinda doubles up. Ah well...
+
+  # Register dynamic changing of the board.
+  window.onhashchange = ()->
+    new_hash = window.location.href.split("#")
+    if new_hash.length == 2 and new_hash[1].length > 3 and new_hash[1].length % 3 == 0 # Check we have a hash
+      view_state = game_states[new_hash[1].length // 3 - 2]
+      board.load_state(view_state)
+      board.update()
 
 
 

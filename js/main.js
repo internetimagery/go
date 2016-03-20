@@ -77,19 +77,33 @@
     }
     game_data.current = game_states.length;
     board.update();
-    return board.register(function(pos) {
-      var clean_state;
-      clean_state = board.dump_state();
-      try {
-        clean_state = play_stone(game_data.current % 2 + 1, pos, board, game_states[game_states.length - 2]);
-        game_data.current += 1;
-        game_data.add_move(pos);
-        return window.location.href = "" + url[0] + "#" + (game_data.write_id());
-      } finally {
-        board.load_state(clean_state);
-        board.update();
+    board.register(function(pos) {
+      var current_state, error;
+      if (game_data.current === game_states.length) {
+        current_state = game_states.length === 0 ? board.dump_state() : game_states[game_states.length - 1];
+        try {
+          current_state = play_stone(game_data.current % 2 + 1, pos, board, game_states[game_states.length - 2]);
+          game_states.push(current_state);
+          game_data.current = game_states.length;
+          game_data.add_move(pos);
+          return window.location.href = "" + url[0] + "#" + (game_data.write_id());
+        } catch (_error) {
+          error = _error;
+          return alert(error);
+        } finally {
+          board.load_state(current_state);
+        }
       }
     });
+    return window.onhashchange = function() {
+      var new_hash, view_state;
+      new_hash = window.location.href.split("#");
+      if (new_hash.length === 2 && new_hash[1].length > 3 && new_hash[1].length % 3 === 0) {
+        view_state = game_states[Math.floor(new_hash[1].length / 3) - 2];
+        board.load_state(view_state);
+        return board.update();
+      }
+    };
   };
 
   main();
