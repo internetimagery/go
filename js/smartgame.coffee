@@ -5,7 +5,7 @@
 # @return {object} The SGF file represented as a JS object
 ###
 
-this.parse = (sgf) ->
+this.sgf_parse = (sgf) ->
   'use strict'
   parse = undefined
   parser = undefined

@@ -7,7 +7,7 @@
   # - Assume 50 characters for use in domain / host / page / etc.
   # - First digit referse to game type. 10 potential options.
   # - Next two digits refer to board size.
-  # - Board size limit is 3 - 62.
+  # - Board size limit is 3 - 52.
   # - Split the following digits into chunks of 2. Chunks represent a turn each.
   # - Turns in chronilogical order
   # - Chunks are board positions or two dashes is a pass
@@ -15,8 +15,7 @@
   # - Number of turns and current game state can be determined by looking at the history
   # - Current player can be determined by turn number
 
-move_chars = ["0","1","2","3","4","5","6","7","8","9",
-"a","b","c","d","e","f","g","h","i","j","k","l","m",
+move_chars = ["a","b","c","d","e","f","g","h","i","j","k","l","m",
 "n","o","p","q","r","s","t","u","v","w","x","y","z",
 "A","B","C","D","E","F","G","H","I","J","K","L","M",
 "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
@@ -62,8 +61,8 @@ class Game_Data
         throw "Invalid Game Mode"
 
       board_size = parseInt(id[1 .. 2]) # Get board size
-      if isNaN(board_size) or board_size < 3 or board_size > 62 # Validate its size
-        throw "Invalid Board Size. Sizes must be between 3 and 62."
+      if isNaN(board_size) or board_size < 3 or board_size > 52 # Validate its size
+        throw "Invalid Board Size. Sizes must be between 3 and 52."
 
       turns = id[3 ...] # Trim off just the turns data
 
@@ -79,7 +78,7 @@ class Game_Data
         chunk *= 2
         chunk_data = turns[chunk ... chunk + 2]
         console.log "data", chunk_data
-        if chunk_data == "--" # Special case. We have a "PASS"
+        if chunk_data == "[]" # Special case. We have a "PASS"
           moves.push(chunk_data)
         else
           chunk_data = decode_move(chunk_data, board_size)
