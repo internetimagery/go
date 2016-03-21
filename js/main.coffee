@@ -112,6 +112,7 @@ main = ()->
         board.load_state(current_state)
         player = game_data.current % 2
         board.update(player + 1) # Draw board changes
+        window.document.title = "Move #{game_states.length}"
         indicate(player)
       catch error
         board.load_state(current_state) # Undo
@@ -128,6 +129,7 @@ main = ()->
     game_data.current = move
     board.load_state(game_states[move - 1])
     board.update(move % 2 + 1)
+    window.document.title = "Move #{move}"
     indicate(move % 2)
 
 
