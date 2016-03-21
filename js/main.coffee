@@ -9,8 +9,8 @@
 # Small player indicator
 indicate = (player)->
   element = [
-    document.getElementById("player-white"),
-    document.getElementById("player-black")]
+    document.getElementById("player-black"),
+    document.getElementById("player-white")]
   for e in element
     e.setAttribute("style", "")
   element[player].setAttribute("style", "box-shadow: 0px 0px 3px 3px yellow;")

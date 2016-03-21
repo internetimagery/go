@@ -17,10 +17,10 @@ class Board
     @callbacks = []
     @stone_class = [
       "empty", # Completely empty
-      "stone set white", # White stone on board
       "stone set black",
-      "empty-white", # Empty hover pieces
-      "empty-black"
+      "stone set white", # White stone on board
+      "empty-black",
+      "empty-white" # Empty hover pieces
     ]
     @board_state = []
     if @size < 2
