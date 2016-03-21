@@ -64,3 +64,6 @@ Temporary Items
 
 ### Coffeescript ###
 *.js
+
+# NODE
+node_modules/*
