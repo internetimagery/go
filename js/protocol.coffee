@@ -28,10 +28,10 @@ class Game_Data
     if move > @board_size ** 2
       throw "Move is too large to fit on the board"
     @moves.push("000#{move}"[-3 ..])
- # Get ID that represents game virewable.
+ # Get ID that represents game viewable.
   write_id: ()->
     size = "00#{@board_size}"[-2 ..]
-    moves = ("000#{move}"[-3 ..] for move in @moves).join("")
+    moves = ("000#{move}"[-3 ..] for move in @moves)[... @current].join("")
     return @mode + size + moves
 # Load a game ID into the object
   read_id: (id)->
