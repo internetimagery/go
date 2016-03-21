@@ -4,10 +4,16 @@
 #05001002005008007012011
 #05---001002005008007012011---004006
 
-# TODO: look into adding some animations
 # TODO: add gnugpg signing option to url for authenticity "https://openpgpjs.org/"
-# TODO: google style diagonal lined background to board
-# TODO: make board size work nicely on desktop and mobile
+
+# Small player indicator
+indicate = (player)->
+  element = [
+    document.getElementById("player-white"),
+    document.getElementById("player-black")]
+  for e in element
+    e.setAttribute("style", "")
+  element[player].setAttribute("style", "box-shadow: 0px 0px 3px 3px yellow;")
 
 # Capture a group
 capture = (stone, board)->
@@ -64,7 +70,7 @@ main = ()->
     game_data.read_id(url[1]) # Load game data
   else # No data to load? Set us up at default
     console.log "!! NEW GAME !!"
-    window.location.href = "#{url[0]}##{game_data.write_id()}"
+    history.replaceState(0, "start", "#{url[0]}##{game_data.write_id()}")
 
   # Initialize our board
   board = new Board(document.getElementById("board"), game_data.board_size)
@@ -73,24 +79,25 @@ main = ()->
   for move in game_data.moves
     if move == "---" # We have a pass
       if game_states.length == 0 # First entry into game states
-        game_states.push(board.dump_state())
+        state = board.dump_state()
       else
-        game_states.push(game_states[game_states.length - 2]) # Copy last game state
+        state = game_states[game_states.length - 2] # Copy last gamestate
     else
       state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1])
-      game_states.push(state)
+    game_states.push(state) # Add state to list of states
 
     # Initialize browser history following game
     window.document.title = "Move #{game_states.length}"
     game_data.current = game_states.length
     state_url = "#{url[0]}##{game_data.write_id()}"
     if game_data.current == 0
-      history.replaceState(game_states[game_states.length], "Start", state_url)
+      history.replaceState(game_states.length, "Start", state_url)
     else
-      history.pushState(game_states[game_states.length], "Move #{game_data.current}", state_url)
+      history.pushState(game_states.length, "Move #{game_data.current}", state_url)
 
   # Update visuals
   board.update(game_states.length % 2 + 1)
+  indicate(game_states.length % 2)
 
   # Allow the player to place stones!
   board.register (pos)->
@@ -101,27 +108,27 @@ main = ()->
         game_states.push(current_state)
         game_data.current = game_states.length
         game_data.add_move(pos)
-        window.location.href = "#{url[0]}##{game_data.write_id()}" # Let hash-hook update for us
+        history.pushState(game_states.length, "Move #{game_states.length}", "#{url[0]}##{game_data.write_id()}")
         board.load_state(current_state)
+        player = game_data.current % 2
+        board.update(player + 1) # Draw board changes
+        indicate(player)
       catch error
         board.load_state(current_state) # Undo
         alert error
     else
       alert "Cannot add move. The game has progressed past this point."
 
-  # Register dynamic changing of the board.
-  window.onhashchange = ()->
-    new_hash = window.location.href.split("#")
-    if new_hash.length == 2 and new_hash[1].length > 3 and new_hash[1].length % 3 == 0 # Check we have a hash
-      game_data.current = new_hash[1].length // 3 - 1
-      window.document.title = "Move #{game_data.current}"
-      view_state = game_states[game_data.current - 1]
-      board.load_state(view_state)
-      board.update(game_data.current % 2 + 1)
-
-  # # TEST
-  # window.addEventListener "popstate", (event)->
-  #   console.log "state", event
+  # Update board to requested state
+  window.addEventListener "popstate", (event)->
+    move = parseInt(event.state)
+    if isNaN(move)
+      throw "Invalid game state!"
+    console.log "Loaded game state #{move}."
+    game_data.current = move
+    board.load_state(game_states[move - 1])
+    board.update(move % 2 + 1)
+    indicate(move % 2)
 
 
 main()
