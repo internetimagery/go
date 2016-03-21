@@ -64,6 +64,11 @@ body {
   /*width: 1px;*/
 }
 
+.star {
+  background-color: black;
+  border-radius: 50%;
+}
+
 /*STONES*/
 .stone {
   border-radius: 50%;

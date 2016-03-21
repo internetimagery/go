@@ -29,6 +29,7 @@ class Board
     # Size some things proportionate to the board size
     grid_chunk = 100 / (@size - 1) # Space between grids
     stone_size = grid_chunk * 0.9
+    star_size = stone_size * 0.2
 
     # Create an inner frame, smaller than the board, so our stones don't fall off the sides
     inner = Create("grid", element)
@@ -45,8 +46,12 @@ class Board
 
     # Add placeholder positions to place stones
     @sockets = []
+    center = if @size % 2 == 1 then @size // 2 else null # Get center
     for col in [0 ... @size]
       for row in [0 ... @size]
+        if center and col == center and row == center
+          star = Create("star", inner)
+          star.resize(row * grid_chunk - star_size * 0.5, col * grid_chunk - star_size * 0.5, star_size, star_size, "position:absolute;")
         socket = Create("empty", inner)
         socket.player = 0
         socket.resize(row * grid_chunk - stone_size * 0.5, col * grid_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;")
