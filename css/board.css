@@ -32,12 +32,22 @@ body {
 
 .menu {
   position: fixed;
-  left: 0px;
   top: 0px;
   padding: 5px;
-  border-bottom-right-radius: 10px;
   background-color: #8B8386;
   box-shadow: 0px 1px 4px 0px black;
+  vertical-align: center;
+  text-align: center;
+}
+
+.left {
+  left: 0px;
+  border-bottom-right-radius: 10px;
+}
+
+.right {
+  right: 0px;
+  border-bottom-left-radius: 10px;
 }
 
 .menu .entry {
