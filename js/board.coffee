@@ -46,12 +46,28 @@ class Board
 
     # Add placeholder positions to place stones
     @sockets = []
-    center = if @size % 2 == 1 then @size // 2 else null # Get center
+
+    stars = []
+    if @size % 2 == 1
+      center = @size // 2
+      stars.push [center, center]
+    if 7 < @size < 13
+      stars.push [2, 2]
+      stars.push [2, @size - 3]
+      stars.push [@size - 3, 2]
+      stars.push [@size - 3, @size - 3]
+    if 13 <= @size
+      stars.push [3, 3]
+      stars.push [3, @size - 4]
+      stars.push [@size - 4, 3]
+      stars.push [@size - 4, @size - 4]
+
     for col in [0 ... @size]
       for row in [0 ... @size]
-        if center and col == center and row == center
-          star = Create("star", inner)
-          star.resize(row * grid_chunk - star_size * 0.5, col * grid_chunk - star_size * 0.5, star_size, star_size, "position:absolute;")
+        for star in stars
+          if star[0] == row and star[1] == col
+            star = Create("star", inner)
+            star.resize(row * grid_chunk - star_size * 0.5, col * grid_chunk - star_size * 0.5, star_size, star_size, "position:absolute;")
         socket = Create("empty", inner)
         socket.player = 0
         socket.resize(row * grid_chunk - stone_size * 0.5, col * grid_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;")

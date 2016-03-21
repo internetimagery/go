@@ -7,7 +7,7 @@
   # - Assume 50 characters for use in domain / host / page / etc.
   # - First digit referse to game type. 10 potential options.
   # - Next two digits refer to board size.
-  # - Board size limit is 2 - 62.
+  # - Board size limit is 3 - 62.
   # - Split the following digits into chunks of 2. Chunks represent a turn each.
   # - Turns in chronilogical order
   # - Chunks are board positions or two dashes is a pass
@@ -62,8 +62,8 @@ class Game_Data
         throw "Invalid Game Mode"
 
       board_size = parseInt(id[1 .. 2]) # Get board size
-      if isNaN(board_size) or board_size < 2 or board_size > 62 # Validate its size
-        throw "Invalid Board Size. Sizes must be between 2 and 62."
+      if isNaN(board_size) or board_size < 3 or board_size > 62 # Validate its size
+        throw "Invalid Board Size. Sizes must be between 3 and 62."
 
       turns = id[3 ...] # Trim off just the turns data
 
