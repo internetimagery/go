@@ -79,8 +79,18 @@ main = ()->
     else
       state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1])
       game_states.push(state)
-  game_data.current = game_states.length
-  board.update(game_states.length % 2 + 1) # Update board visuals
+
+    # Initialize browser history following game
+    window.document.title = "Move #{game_states.length}"
+    game_data.current = game_states.length
+    state_url = "#{url[0]}##{game_data.write_id()}"
+    if game_data.current == 0
+      history.replaceState(game_states[game_states.length], "Start", state_url)
+    else
+      history.pushState(game_states[game_states.length], "Move #{game_data.current}", state_url)
+
+  # Update visuals
+  board.update(game_states.length % 2 + 1)
 
   # Allow the player to place stones!
   board.register (pos)->
@@ -92,10 +102,10 @@ main = ()->
         game_data.current = game_states.length
         game_data.add_move(pos)
         window.location.href = "#{url[0]}##{game_data.write_id()}" # Let hash-hook update for us
+        board.load_state(current_state)
       catch error
+        board.load_state(current_state) # Undo
         alert error
-      finally
-        board.load_state(current_state) # This kinda doubles up. Ah well...
     else
       alert "Cannot add move. The game has progressed past this point."
 
@@ -104,10 +114,14 @@ main = ()->
     new_hash = window.location.href.split("#")
     if new_hash.length == 2 and new_hash[1].length > 3 and new_hash[1].length % 3 == 0 # Check we have a hash
       game_data.current = new_hash[1].length // 3 - 1
+      window.document.title = "Move #{game_data.current}"
       view_state = game_states[game_data.current - 1]
       board.load_state(view_state)
       board.update(game_data.current % 2 + 1)
 
+  # # TEST
+  # window.addEventListener "popstate", (event)->
+  #   console.log "state", event
 
 
 main()
