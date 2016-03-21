@@ -62,8 +62,8 @@ class Game_Data
         throw "Invalid Game Mode"
 
       board_size = parseInt(id[1 .. 2]) # Get board size
-      if isNaN(board_size) or board_size < 2 or board_size > 65 # Validate its size
-        throw "Invalid Board Size. Sizes must be between 2 and 64."
+      if isNaN(board_size) or board_size < 2 or board_size > 62 # Validate its size
+        throw "Invalid Board Size. Sizes must be between 2 and 62."
 
       turns = id[3 ...] # Trim off just the turns data
 
