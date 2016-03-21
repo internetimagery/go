@@ -49,7 +49,6 @@ class Game_Data
     @moves.push(move)
  # Get ID that represents game viewable.
   write_id: ()->
-    console.log @moves[0], encode_move(@moves[0], @board_size)
     size = "00#{@board_size}"[-2 ..]
     moves = (encode_move(move, @board_size) for move in @moves)[... @current].join("")
     return @mode + size + moves
