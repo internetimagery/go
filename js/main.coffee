@@ -24,6 +24,10 @@ capture = (stone, board)->
 
 # Play a stone! Validate game rules!
 play_stone = (player, pos, board, ko_check_move)->
+  # Check for pass
+  if pos == null
+    return board.dump_state()
+
   # Validate Placement
   if board.get_player(pos) != 0 # There is a stone already there
     throw "Illegal Move: Space occupied."
@@ -72,8 +76,9 @@ main = ()->
     console.log "!! NEW GAME !!"
     history.replaceState(0, "start", "#{url[0]}##{game_data.write_id()}")
 
-  # Initialize our board
+  # Initialize our board and controls
   board = new Board(document.getElementById("board"), game_data.board_size)
+  pass_btn = document.getElementById("pass")
 
   # Load up any moves
   for move in game_data.moves
@@ -119,6 +124,10 @@ main = ()->
         alert error
     else
       alert "Cannot add move. The game has progressed past this point."
+
+  # Play a passing move
+  pass_btn.onclick = (e)->
+    board.placement_event(null)
 
   # Update board to requested state
   window.addEventListener "popstate", (event)->

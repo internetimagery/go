@@ -63,6 +63,22 @@ body {
   margin: 5px;
 }
 
+#pass {
+  width: 60px;
+  background: #fc3c11;
+  overflow: hidden;
+  border-radius: 5px;
+  color: #fcdcd4;
+  text-shadow: 0px -1px rgba(0, 0, 0, 0.5);;
+  cursor: pointer;
+  line-height: 29px;
+}
+
+#pass:hover {
+  background: #fc8946;
+  line-height: 28px;
+}
+
 /*GRID*/
 .line-horiz {
   position: absolute;
