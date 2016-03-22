@@ -57,11 +57,6 @@ body {
   margin: 5px;
 }
 
-#uploader {
-  background-image: url("../img/load.png");
-  cursor: pointer;
-}
-
 /*GRID*/
 .line-horiz {
   position: absolute;

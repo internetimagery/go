@@ -22,17 +22,23 @@ move_chars = ["a","b","c","d","e","f","g","h","i","j","k","l","m",
 
 # Decode a move
 decode_move = (move, size)->
-  row = move_chars.indexOf(move[0]) * size
-  col = move_chars.indexOf(move[1])
-  if row == -1 or col == -1
-    throw "Bad Move #{move}."
-  return row + col
+  if move == "[]"
+    return null
+  else
+    row = move_chars.indexOf(move[0]) * size
+    col = move_chars.indexOf(move[1])
+    if row == -1 or col == -1
+      throw "Bad Move #{move}."
+    return row + col
 
 # Turn move into text
 encode_move = (move, size)->
-  row = move_chars[move // size]
-  col = move_chars[move % size]
-  return row.concat(col)
+  if move == null
+    return "[]"
+  else
+    row = move_chars[move // size]
+    col = move_chars[move % size]
+    return row.concat(col)
 
 # Games data represented
 class Game_Data
@@ -77,7 +83,6 @@ class Game_Data
       for chunk in [0 ... turns.length / 2]
         chunk *= 2
         chunk_data = turns[chunk ... chunk + 2]
-        console.log "data", chunk_data
         if chunk_data == "[]" # Special case. We have a "PASS"
           moves.push(chunk_data)
         else
@@ -91,6 +96,27 @@ class Game_Data
       @moves = moves
       @current = moves.length
       console.log "Valid!"
+
+  # Load SGF file
+  load_sgf: (file)->
+    game = smartgamer sgf_parse file
+    info = game.getGameInfo()
+    colour = ["B", "W"]
+    if info.GM != "1"
+      throw "Game file is not a game of GO."
+
+    mode = "0"
+    board_size = parseInt(info.SZ)
+    moves = []
+    for i in [0 ... game.totalMoves()]
+      game.next()
+      move = game.node()[colour[i % 2]]
+      move = "[]" if move == "[tt]" or not move
+      moves.push(decode_move(move, board_size))
+    @mode = mode
+    @board_size = board_size
+    @moves = moves
+    @current = moves.length
 
   # Export Function
 this.Game_Data = Game_Data

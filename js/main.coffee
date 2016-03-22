@@ -77,7 +77,7 @@ main = ()->
 
   # Load up any moves
   for move in game_data.moves
-    if move == "---" # We have a pass
+    if move == null # We have a pass
       if game_states.length == 0 # First entry into game states
         state = board.dump_state()
       else
@@ -131,6 +131,29 @@ main = ()->
     board.update(move % 2 + 1)
     window.document.title = "Move #{move}"
     indicate(move % 2)
+
+  # Load SGF files
+  dropzone = document.getElementById("dropzone") # Drop element
+  dropzone.addEventListener 'dragover', (e)-> # Change mouse to show area is droppable
+    e.stopPropagation()
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "copy"
+  dropzone.addEventListener "drop", (e)->
+    e.stopPropagation()
+    e.preventDefault()
+    files = e.dataTransfer.files
+    if files[0]
+      reader = new FileReader()
+      reader.onload = (e2)->
+        data = e2.target.result # File data
+        try
+          game_data.load_sgf(data)
+          window.location.assign("#{url[0]}##{game_data.write_id()}")
+          location.reload(true)
+        catch error
+          alert "There was a problem loading the SGF."
+          console.error error
+      reader.readAsText(files[0])
 
 
 main()
