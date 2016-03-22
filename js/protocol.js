@@ -37,9 +37,7 @@
     }
 
     Game_Data.prototype.add_move = function(move) {
-      if (move === null) {
-        this.moves.push(move);
-      } else if (move > Math.pow(this.board_size, 2)) {
+      if (move !== null && move > Math.pow(this.board_size, 2)) {
         throw "Move is too large to fit on the board";
       }
       return this.moves.push(move);
