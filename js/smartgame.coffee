@@ -1,3 +1,5 @@
+# Converted from https://github.com/neagle/smartgame
+
 ###*
 # Convert SGF files to a JS object
 # @param {string} sgf A valid SGF file.

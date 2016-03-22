@@ -1,3 +1,5 @@
+# Converted from https://github.com/neagle/smartgamer
+
 ###*
 # Interact with smartgame objects.
 # @param {object} smartgame A JS Object representing a smartgame
