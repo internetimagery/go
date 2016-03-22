@@ -2,7 +2,8 @@
 
 # Size element
 Resize = (x, y, w, h, style)->
-  this.setAttribute("style", "left:#{x}%;top:#{y}%;width:#{w}%;height:#{h}%;" + style)
+  # this.setAttribute("style", "left:#{x}%;top:#{y}%;width:#{w}%;height:#{h}%;" + style)
+  this.setAttribute("style", "margin-left:#{x}%;margin-top:#{y}%;width:#{w}%;height:#{h}%;" + style)
 
 # Create an Element
 Create = (name, parent)->
