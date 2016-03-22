@@ -135,6 +135,11 @@
     pass_btn.onclick = function(e) {
       return board.placement_event(null);
     };
+    document.addEventListener("keypress", function(e) {
+      if (e.key === "p") {
+        return console.log("PASS");
+      }
+    });
     window.addEventListener("popstate", function(event) {
       move = parseInt(event.state);
       if (isNaN(move)) {
