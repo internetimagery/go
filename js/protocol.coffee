@@ -61,7 +61,6 @@ class Game_Data
     return @mode + size + moves
 # Load a game ID into the object
   read_id: (id)->
-    id = decodeURIComponent(id) # Ensure ID isn't encoded
     if id.length >= 3 # Check we have something.
       console.log "Validating game data..."
 

@@ -70,8 +70,8 @@ main = ()->
   # Parse ID from url
   url = window.location.href.split("#")
   if url.length == 2 and url[1] # If there is a hash we might have an ID
-    console.log "!! LOADING GAME !!"
-    game_data.read_id(url[1]) # Load game data
+    console.log "!! LOADING GAME !!"    
+    game_data.read_id(decodeURIComponent(url[1])) # Load game data
   else # No data to load? Set us up at default
     console.log "!! NEW GAME !!"
     history.replaceState(0, "start", "#{url[0]}##{game_data.write_id()}")
