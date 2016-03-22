@@ -137,7 +137,7 @@
     };
     document.addEventListener("keypress", function(e) {
       if (e.key === "p") {
-        return console.log("PASS");
+        return board.placement_event(null);
       }
     });
     window.addEventListener("popstate", function(event) {
