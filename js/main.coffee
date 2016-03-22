@@ -128,6 +128,7 @@ main = ()->
         board.update(player + 1) # Draw board changes
         window.document.title = "Move #{game_states.length}"
         indicate(player)
+        update_tinyurl()
       catch error
         board.load_state(current_state) # Undo
         alert error
