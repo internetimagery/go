@@ -49,7 +49,9 @@ class Game_Data
     @current = 0 # Current viewing position of game
 # Add a new move
   add_move: (move)->
-    if move > @board_size ** 2
+    if move == null
+      @moves.push(move)
+    else if move > @board_size ** 2
       throw "Move is too large to fit on the board"
     @moves.push(move)
  # Get ID that represents game viewable.
@@ -82,15 +84,11 @@ class Game_Data
       moves = []
       for chunk in [0 ... turns.length / 2]
         chunk *= 2
-        chunk_data = turns[chunk ... chunk + 2]
-        if chunk_data == "[]" # Special case. We have a "PASS"
-          moves.push(chunk_data)
+        chunk_data = decode_move(turns[chunk ... chunk + 2], board_size)
+        if isNaN(chunk_data) or (chunk_data != null and chunk_data > cell_num)
+          throw "Invalid Turn @ #{chunk / 3}."
         else
-          chunk_data = decode_move(chunk_data, board_size)
-          if isNaN(chunk_data) or chunk_data > cell_num
-            throw "Invalid Turn @ #{chunk / 3}."
-          else
-            moves.push(chunk_data)
+          moves.push(chunk_data)
       @mode = mode
       @board_size = board_size
       @moves = moves
