@@ -102,12 +102,11 @@ main = ()->
     window.document.title = "Move #{game_states.length}"
     game_data.current = game_states.length
     state_url = "#{url[0]}##{game_data.write_id()}"
-    update_tinyurl()
     if game_data.current == 0
       history.replaceState(game_states.length, "Start", state_url)
     else
       history.pushState(game_states.length, "Move #{game_data.current}", state_url)
-
+    update_tinyurl()
 
   # Update visuals
   board.update(game_states.length % 2 + 1)
