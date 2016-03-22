@@ -155,5 +155,4 @@ main = ()->
           console.error error
       reader.readAsText(files[0])
 
-
-main()
+this.main = main
