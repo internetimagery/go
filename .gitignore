@@ -63,7 +63,7 @@ Temporary Items
 .Trash-*
 
 ### Coffeescript ###
-*.js
+# *.js
 
 # NODE
 node_modules/*
