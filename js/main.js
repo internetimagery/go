@@ -121,7 +121,8 @@
           player = game_data.current % 2;
           board.update(player + 1);
           window.document.title = "Move " + game_states.length;
-          return indicate(player);
+          indicate(player);
+          return update_tinyurl();
         } catch (_error) {
           error = _error;
           board.load_state(current_state);
