@@ -49,9 +49,7 @@ class Game_Data
     @current = 0 # Current viewing position of game
 # Add a new move
   add_move: (move)->
-    if move == null
-      @moves.push(move)
-    else if move > @board_size ** 2
+    if move != null and move > @board_size ** 2
       throw "Move is too large to fit on the board"
     @moves.push(move)
  # Get ID that represents game viewable.
@@ -69,8 +67,8 @@ class Game_Data
         throw "Invalid Game Mode"
 
       board_size = parseInt(id[1 .. 2]) # Get board size
-      if isNaN(board_size) or board_size < 3 or board_size > 52 # Validate its size
-        throw "Invalid Board Size. Sizes must be between 3 and 52."
+      if isNaN(board_size) or board_size < 3 or board_size > move_chars.length # Validate its size
+        throw "Invalid Board Size. Sizes must be between 3 and #{move_chars.length}."
 
       turns = id[3 ...] # Trim off just the turns data
 
