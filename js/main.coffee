@@ -137,6 +137,9 @@ main = ()->
   # Play a passing move
   pass_btn.onclick = (e)->
     board.placement_event(null)
+  document.addEventListener "keypress", (e)->
+    if e.key == "p"
+      board.placement_event(null)
 
   # Update board to requested state
   window.addEventListener "popstate", (event)->

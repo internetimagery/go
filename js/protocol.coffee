@@ -104,6 +104,20 @@ class Game_Data
     mode = "0"
     board_size = parseInt(info.SZ)
     moves = []
+    game.first() # Move to start
+    node = game.node()
+    if node.AB or node.AW # Initial board state
+      for i in [0 .. Math.max(node.AB.length or 0, node.AW.length or 0)]
+        b = node.AB[i]
+        w = node.AW[i]
+        if b
+          moves.push(decode_move(b, board_size))
+        else
+          moves.push(null)
+        if w
+          moves.push(decode_move(w, board_size))
+        else
+          moves.push(null)
     for i in [0 ... game.totalMoves()]
       game.next()
       move = game.node()[colour[i % 2]]
