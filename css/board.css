@@ -10,6 +10,15 @@ body {
     }
 }
 
+#short-link {
+  position: fixed;
+  display: inline-block;
+  width: 25%;
+  top: 0px;
+  left: 37.5%;
+  text-align: center;
+}
+
 /*BOARD*/
 #container {
   /*width: 800px;*/

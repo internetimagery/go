@@ -5,6 +5,12 @@
 #05---001002005008007012011---004006
 
 # TODO: add gnugpg signing option to url for authenticity "https://openpgpjs.org/"
+# TODO: create short-url link using tinyurl api: https://tinyurl.com/api-create.php?url=http://myurl.com/
+
+# Update short url link
+update_tinyurl = ()->
+  elem = document.getElementById("short-link")
+  elem.href = "https://tinyurl.com/api-create.php?url=#{encodeURIComponent(window.location.href)}"
 
 # Small player indicator
 indicate = (player)->
@@ -70,11 +76,12 @@ main = ()->
   # Parse ID from url
   url = window.location.href.split("#")
   if url.length == 2 and url[1] # If there is a hash we might have an ID
-    console.log "!! LOADING GAME !!"    
+    console.log "!! LOADING GAME !!"
     game_data.read_id(decodeURIComponent(url[1])) # Load game data
   else # No data to load? Set us up at default
     console.log "!! NEW GAME !!"
     history.replaceState(0, "start", "#{url[0]}##{game_data.write_id()}")
+    update_tinyurl()
 
   # Initialize our board and controls
   board = new Board(document.getElementById("board"), game_data.board_size)
@@ -95,10 +102,12 @@ main = ()->
     window.document.title = "Move #{game_states.length}"
     game_data.current = game_states.length
     state_url = "#{url[0]}##{game_data.write_id()}"
+    update_tinyurl()
     if game_data.current == 0
       history.replaceState(game_states.length, "Start", state_url)
     else
       history.pushState(game_states.length, "Move #{game_data.current}", state_url)
+
 
   # Update visuals
   board.update(game_states.length % 2 + 1)
@@ -140,6 +149,7 @@ main = ()->
     board.update(move % 2 + 1)
     window.document.title = "Move #{move}"
     indicate(move % 2)
+    update_tinyurl()
 
   # Load SGF files
   dropzone = document.getElementById("dropzone") # Drop element
