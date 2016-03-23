@@ -6,6 +6,8 @@ var uglify = require("gulp-uglify");
 var htmlmin = require("gulp-htmlmin");
 var csso = require("gulp-csso");
 var pages = require("gulp-gh-pages");
+var concat = require("gulp-concat");
+var htmlreplace = require("gulp-html-replace");
 
 // Watcher
 gulp.task("watch", function(){
@@ -24,8 +26,10 @@ gulp.task("deploy", function(){
 
 gulp.task("html", function(){
   gulp.src("./*.html")
+  .pipe(htmlreplace({scripts: "js/game.js"}))
   .pipe(htmlmin({
-    collapseWhitespace: true
+    collapseWhitespace: true,
+    removeComments: true
   }))
   .pipe(gulp.dest("./dist"))
 });
@@ -35,9 +39,9 @@ gulp.task("js", function(){
   gulp.src("./js/*.coffee")
   .pipe(coffee({bare:false}).on("error", function(err){console.log(err);}))
   .pipe(gulp.dest("./js"))
-
-  // Shrink javascript
-  gulp.src("./js/*.js")
+  // Combine all together
+  .pipe(concat("game.js"))
+  // Shrink
   .pipe(uglify())
   .pipe(gulp.dest("./dist/js"))
 });
