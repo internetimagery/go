@@ -26,7 +26,7 @@ gulp.task("deploy", function(){
 
 gulp.task("html", function(){
   gulp.src("./*.html")
-  .pipe(htmlreplace({scripts: "js/game.js"}))
+  .pipe(htmlreplace({scripts: "js/game.js", style: "css/style.css"}))
   .pipe(htmlmin({
     collapseWhitespace: true,
     removeComments: true
@@ -48,6 +48,7 @@ gulp.task("js", function(){
 
 gulp.task("css", function(){
   gulp.src("./css/*.css")
+  .pipe(concat("style.css"))
   .pipe(csso())
   .pipe(gulp.dest("./dist/css"))
 });
