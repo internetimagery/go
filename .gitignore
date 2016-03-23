@@ -68,3 +68,4 @@ Temporary Items
 # NODE
 node_modules/*
 dist/*
+.publish/*
