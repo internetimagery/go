@@ -1,0 +1,27 @@
+{
+  "name": "go",
+  "version": "1.0.0",
+  "description": "Go Board storing game state in URL",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/internetimagery/go.git"
+  },
+  "keywords": [
+    "go",
+    "baduk",
+    "game"
+  ],
+  "author": "jason dixon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/internetimagery/go/issues"
+  },
+  "homepage": "https://github.com/internetimagery/go#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1"
+  }
+}
