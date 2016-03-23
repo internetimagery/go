@@ -5,6 +5,22 @@ var coffee = require("gulp-coffee");
 var uglify = require("gulp-uglify");
 var htmlmin = require("gulp-htmlmin");
 var csso = require("gulp-csso");
+var pages = require("gulp-gh-pages");
+
+// Watcher
+gulp.task("watch", function(){
+  gulp.watch("./js/*.coffee", ["js"])
+  gulp.watch("./css/*.css", ["css"])
+  gulp.watch("./*.html", ["html"])
+  gulp.watch("./img/*", ["img"])
+});
+
+gulp.task("default", ["html", "js", "css", "img"]);
+
+gulp.task("deploy", function(){
+  gulp.src("./dist/*")
+  .pipe(pages({force: true, push: true}))
+});
 
 gulp.task("html", function(){
   gulp.src("./*.html")
@@ -18,10 +34,10 @@ gulp.task("js", function(){
   // Prep Coffeescript files
   gulp.src("./js/*.coffee")
   .pipe(coffee({bare:false}).on("error", function(err){console.log(err);}))
-  .pipe(gulp.dest("./dist"))
+  .pipe(gulp.dest("./js"))
 
   // Shrink javascript
-  gulp.src("./dist/*.js")
+  gulp.src("./js/*.js")
   .pipe(uglify())
   .pipe(gulp.dest("./dist/js"))
 });
@@ -32,9 +48,7 @@ gulp.task("css", function(){
   .pipe(gulp.dest("./dist/css"))
 });
 
-// Watcher
-gulp.task("watch", function(){
-  gulp.watch("./js/*.coffee", ["js"])
-  gulp.watch("./css/*.css", ["css"])
-  gulp.watch("./*.html", ["html"])
+gulp.task("img", function(){
+  gulp.src("./img/*")
+  .pipe(gulp.dest("./dist/img"))
 });
