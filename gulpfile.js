@@ -19,9 +19,9 @@ gulp.task("watch", function(){
 
 gulp.task("default", ["html", "js", "css", "img"]);
 
-gulp.task("deploy", function(){
+gulp.task("upload", ["default"], function(){
   gulp.src("./dist/**/*")
-  .pipe(pages({force: true, push: false}))
+  .pipe(pages({force: true, push: true}))
 });
 
 gulp.task("html", function(){
