@@ -20,8 +20,8 @@ gulp.task("watch", function(){
 gulp.task("default", ["html", "js", "css", "img"]);
 
 gulp.task("deploy", function(){
-  gulp.src("./dist/*")
-  .pipe(pages({force: true, push: true}))
+  gulp.src("./dist/**/*")
+  .pipe(pages({force: true, push: false}))
 });
 
 gulp.task("html", function(){
