@@ -69,3 +69,6 @@ Temporary Items
 node_modules/*
 dist/*
 .publish/
+
+# Release
+*.zip

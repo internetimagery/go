@@ -8,6 +8,7 @@ var csso = require("gulp-csso");
 var pages = require("gulp-gh-pages");
 var concat = require("gulp-concat");
 var htmlreplace = require("gulp-html-replace");
+var zip = require("gulp-zip");
 
 // Watcher
 gulp.task("watch", function(){
@@ -17,11 +18,20 @@ gulp.task("watch", function(){
   gulp.watch("./img/*", ["img"])
 });
 
+// Put together a distribution
 gulp.task("default", ["html", "js", "css", "img"]);
 
-gulp.task("upload", ["default"], function(){
+// Upload to gh-Pages
+gulp.task("upload", ["default", "release"], function(){
   gulp.src("./dist/**/*")
   .pipe(pages({force: true, push: true}))
+});
+
+// Create a downloadable release file
+gulp.task("release", function(){
+  gulp.src(["./dist/**/*", "!./dist/**/*.zip"])
+  .pipe(zip("download.zip"))
+  .pipe(gulp.dest("./dist"))
 });
 
 gulp.task("html", function(){
