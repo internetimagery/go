@@ -28,6 +28,19 @@ capture = (stone, board)->
     for stone in group
       board.place(stone, 0)
 
+# Play a stone without checking for issues
+play_stone_no_check = (player, pos, board)->
+  state = board.dump_state()
+  if pos == null
+    return state
+  board.place(pos, player)
+  for dir, stone of board.get_surroundings(pos)
+    if board.get_player(stone) != player and board.is_surrounded(stone)
+      capture(stone, board)
+  if board.is_surrounded(pos)
+    board.place(pos, 0)
+  return board.dump_state()
+
 # Play a stone! Validate game rules!
 play_stone = (player, pos, board, ko_check_move)->
   # Check for pass
@@ -100,7 +113,7 @@ main = ()->
       board.place(m, 0) for m in (move[2] or []) # Empty
       state = board.dump_state()
     else
-      state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1])
+      state = play_stone_no_check(game_states.length % 2 + 1, move, board)
     game_states.push(state) # Add state to list of states
 
     # Initialize browser history following game

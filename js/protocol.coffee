@@ -21,6 +21,34 @@ move_chars = ["a","b","c","d","e","f","g","h","i","j","k","l","m",
 "A","B","C","D","E","F","G","H","I","J","K","L","M",
 "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
 
+# Utility. Flatten a nested array
+flatten = (array)->
+  result = []
+  for a in array
+    for b in a
+      result.push(b)
+  return result
+
+# Expand shorthand
+expand_move = (move)->
+  if move.length == 5 and move[2] == ":" # Annoying shorthand
+    first = [
+      move_chars.indexOf(move[0])
+      move_chars.indexOf(move[3])
+    ]
+    second = [
+      move_chars.indexOf(move[1])
+      move_chars.indexOf(move[4])
+    ]
+    # Run through all combinations
+    moves = []
+    for first_char in [first[0] .. first[1]]
+      for second_char in [second[0] .. second[1]]
+        moves.push "#{move_chars[first_char]}#{move_chars[second_char]}"
+    return moves
+  else
+    return [move]
+
 # Decode a move
 decode_move = (move, size)->
   if move == "[]" # A Pass
@@ -138,15 +166,19 @@ class Game_Data
     board_size = parseInt(info.SZ)
     moves = []
     game.first() # Move to start
-    for i in [0 ... game.totalMoves()]
+    for i in [0 .. game.totalMoves()]
       node = game.node() # Get the current node
 
       # Check for forced placement nodes. Booo!
       if node.AB or node.AW or node.AE
+        # Expand any shorthand
+        AB = flatten(expand_move(m) for m in Array.concat(node.AB or []))
+        AW = flatten(expand_move(m) for m in Array.concat(node.AW or []))
+        AE = flatten(expand_move(m) for m in Array.concat(node.AE or []))
         forced = [
-          (decode_move(m, board_size) for m in Array.concat(node.AB or []))
-          (decode_move(m, board_size) for m in Array.concat(node.AW or []))
-          (decode_move(m, board_size) for m in Array.concat(node.AE or []))
+          (decode_move(m, board_size) for m in AB),
+          (decode_move(m, board_size) for m in AW),
+          (decode_move(m, board_size) for m in AE)
         ]
         moves.push(forced)
 
