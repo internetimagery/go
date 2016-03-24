@@ -55,15 +55,16 @@ class Game_Data
     @moves.push(move)
  # Get ID that represents game viewable.
   write_id: ()->
-    size = "00#{@board_size}"[-2 ..]
+    bs = @board_size
+    size = "00#{bs}"[-2 ..]
     moves = []
     for i in [0 ... @current]
       move = @moves[i]
       if Array.isArray(move) # We have a forced placement
-        placement = ((encode_move(b, @board_size) for b in a).join("") for a in move)
-        moves.push("(#{placement.join(encode_move(null, @board_size))})")
+        placement = ((encode_move(b, bs) for b in a).join("") for a in move)
+        moves.push("(#{placement.join(encode_move(null, bs))})")
       else
-        moves.push(encode_move(move, @board_size))
+        moves.push(encode_move(move, bs))
     return @mode + size + moves.join("")
 # Load a game ID into the object
   read_id: (id)->
@@ -90,7 +91,7 @@ class Game_Data
       moves = []
       buffer = []
       placement_bucket = [] # All our placement requests. Black / White / Removal
-      placement_buffer = []
+      placement_section = []
       placement_zone = false
       for char in [0 ... turns.length]
         if turns[char] == "("
@@ -99,26 +100,26 @@ class Game_Data
           placement_section = [] # Section we're working with
         else if turns[char] == ")"
           placement_zone = false # We have left the zone
-          placement_bucket.push(placment_buffer)
+          placement_bucket.push(placement_section)
           for i in [0 ... 3 - placement_bucket.length] # Ensure we have a grouping of three
             placement_bucket.push([])
           moves.push(placement_bucket) # Add final move list
-        else if buffer.length != 2
-          buffer.push(turns[char])
         else
-          chunk_data = decode_move(buffer.join(""), board_size)
-          buffer = []
-          if isNaN(chunk_data) or (chunk_data != null and chunk_data > cell_num)
-            throw "Invalid Turn @ #{moves.length}."
-          else
-            if placement_zone # We are performing a placement setup
-              if chunk_data == null # moving to next placement section
-                placement_bucket.push(placement_section)
-                placement_section = [] # Reset
-              else
-                placement_section.push(chunk_data) # Add to section
+          buffer.push(turns[char])
+          if buffer.length == 2
+            chunk_data = decode_move(buffer.join(""), board_size)
+            buffer = []
+            if isNaN(chunk_data) or (chunk_data != null and chunk_data > cell_num)
+              throw "Invalid Turn @ #{moves.length}."
             else
-              moves.push(chunk_data)
+              if placement_zone # We are performing a placement setup
+                if chunk_data == null # moving to next placement section
+                  placement_bucket.push(placement_section)
+                  placement_section = [] # Reset
+                else
+                  placement_section.push(chunk_data) # Add to section
+              else
+                moves.push(chunk_data)
       @mode = mode
       @board_size = board_size
       @moves = moves
@@ -143,9 +144,9 @@ class Game_Data
       # Check for forced placement nodes. Booo!
       if node.AB or node.AW or node.AE
         forced = [
-          (decode_move(m, board_size) for m in node.AB or [])
-          (decode_move(m, board_size) for m in node.AW or [])
-          (decode_move(m, board_size) for m in node.AE or [])
+          (decode_move(m, board_size) for m in Array.concat(node.AB or []))
+          (decode_move(m, board_size) for m in Array.concat(node.AW or []))
+          (decode_move(m, board_size) for m in Array.concat(node.AE or []))
         ]
         moves.push(forced)
 
@@ -157,6 +158,7 @@ class Game_Data
           move = node[colour[(i + 1) % 2]]
         move = "[]" if move == "[tt]" # Support FF[3] passing.
         moves.push(decode_move(move, board_size))
+      game.next()
 
     @mode = mode
     @board_size = board_size
@@ -165,3 +167,21 @@ class Game_Data
 
   # Export Function
 this.Game_Data = Game_Data
+
+# g = new Game_Data()
+# g.load_sgf("(;GM[1]FF[4]SZ[19]
+# GN[Eye-stealing tesuji]
+# PC[http://senseis.xmp.net/?Kombilo]AP[GoWiki:2009]
+# DT[2009-04-22]
+# C[Diagram from http://senseis.xmp.net/?Kombilo
+#
+# Eye-stealing tesuji]
+# PL[B]
+#
+# AB[ik]
+# AW[ii][ji][kj][kk]
+#
+#
+# ;
+# )
+# ")
