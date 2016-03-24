@@ -5,7 +5,7 @@
 #05---001002005008007012011---004006
 
 # TODO: add gnugpg signing option to url for authenticity "https://openpgpjs.org/"
-# TODO: create short-url link using tinyurl api: https://tinyurl.com/api-create.php?url=http://myurl.com/
+# TODO: add forced removal
 
 # Update short url link
 update_tinyurl = ()->

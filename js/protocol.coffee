@@ -3,17 +3,16 @@
 # Example - http://host.com/page.html#19001033022002
 
 # RULES
-  # - Enforce a limit of 2000 characters to the URL.
-  # - Assume 50 characters for use in domain / host / page / etc.
-  # - First digit referse to game type. 10 potential options.
-  # - Next two digits refer to board size.
-  # - Board size limit is 3 - 52.
+  # - Enforce a limit of 2000 characters to the URL for older browsers.
+  # - Assume 50 characters for use in domain / host / page / etc. Leaving us 1950 chars.
+  # - First digit referse to game type. 10 potential options. Currently unused... perhaps komi
+  # - Next two digits refer to board size. Limit 3 - 52 size.
   # - Split the following digits into chunks of 2. Chunks represent a turn each.
   # - Turns in chronilogical order
-  # - Chunks are board positions or two dashes is a pass
+  # - Special cases: "[]" is a pass. "--" the following stone is to be removed
   # - Turn limit of 973
   # - Number of turns and current game state can be determined by looking at the history
-  # - Current player can be determined by turn number
+  # - Current player is determined by turn number
 
 move_chars = ["a","b","c","d","e","f","g","h","i","j","k","l","m",
 "n","o","p","q","r","s","t","u","v","w","x","y","z",
@@ -22,8 +21,10 @@ move_chars = ["a","b","c","d","e","f","g","h","i","j","k","l","m",
 
 # Decode a move
 decode_move = (move, size)->
-  if move == "[]"
+  if move == "[]" # A Pass
     return null
+  else if move == "--" # Marking next stone for forced removal
+    return -1
   else
     row = move_chars.indexOf(move[0]) * size
     col = move_chars.indexOf(move[1])
@@ -33,8 +34,10 @@ decode_move = (move, size)->
 
 # Turn move into text
 encode_move = (move, size)->
-  if move == null
+  if move == null # A Pass
     return "[]"
+  else if move < 0 # Stone marked for forced removal
+    return "--"
   else
     row = move_chars[move // size]
     col = move_chars[move % size]
@@ -105,24 +108,30 @@ class Game_Data
     board_size = parseInt(info.SZ)
     moves = []
     game.first() # Move to start
-    node = game.node()
-    if node.AB or node.AW # Initial board state
-      for i in [0 .. Math.max(node.AB.length or 0, node.AW.length or 0)]
-        b = node.AB[i]
-        w = node.AW[i]
-        if b
-          moves.push(decode_move(b, board_size))
-        else
-          moves.push(null)
-        if w
-          moves.push(decode_move(w, board_size))
-        else
-          moves.push(null)
     for i in [0 ... game.totalMoves()]
-      game.next()
-      move = game.node()[colour[i % 2]]
-      move = "[]" if move == "[tt]" or not move
+      node = game.node() # Get the current node
+      play = i % 2
+
+      # Check for forced placement nodes. Booo!
+      if node.AB or node.AW
+        AB = node.AB or []
+        AW = node.AW or []
+        for i in [0 .. Math.max(AB.length, AW.length)] # Play out the sequence
+          place = [AB[i], AW[i]]
+          p1 = place[play]
+          p2 = place[(i + 1) % 2]
+          moves.push(if p1 then decode_move(p1, board_size) else null)
+          moves.push(if p2 then decode_move(p2, board_size) else null)
+      if node.AE # We have some stones that need removing forcefully
+        for stone in node.AE or []
+          moves.push(-1) # Mark the next stone for removal
+          moves.push(decode_move(stone))
+
+      # Check for actual plays! Yay!
+      move = node[colour[play]]
+      move = "[]" if move == "[tt]" or not move # Support FF[3] passing.
       moves.push(decode_move(move, board_size))
+
     @mode = mode
     @board_size = board_size
     @moves = moves
