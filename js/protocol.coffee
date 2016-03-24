@@ -9,7 +9,8 @@
   # - Next two digits refer to board size. Limit 3 - 52 size.
   # - Split the following digits into chunks of 2. Chunks represent a turn each.
   # - Turns in chronilogical order
-  # - Special cases: "[]" is a pass. Moves in "()" are setups. Rules don't apply and they're played out as Black, White, Removal
+  # - Special cases: "[]" is a pass. Moves in "()" are setups. Rules don't apply to these moves and they replace whatever already exists on the board.
+  # - Decoded. Moves are an int each. Null for a pass. Negative moves are forced subtraction. Moves larger than boardsize ** 2 are forced addition.
   # - Turn limit of 973
   # - Number of turns and current game state can be determined by looking at the history
   # - Current player is determined by turn number
@@ -80,17 +81,31 @@ class Game_Data
       cell_num = board_size ** 2 # Number of cells in board (square)
       moves = []
       buffer = []
+      setup_zone = null
       for char in [0 ... turns.length]
-        if char == "(" or char == ")" # We are in a special zone
-          continue # TODO: Add in special case code here
+        if turns[char] == "("
+          setup_zone = 0 # We are in the special zone
+        else if turns[char] == ")"
+          setup_zone = null # We have left the zone
         else if buffer.length != 2
-          buffer.push(char)
+          buffer.push(turns[char])
         else
           chunk_data = decode_move(buffer.join(""), board_size)
+          buffer = []
           if isNaN(chunk_data) or (chunk_data != null and chunk_data > cell_num)
             throw "Invalid Turn @ #{moves.length}."
           else
-            moves.push(chunk_data)
+            if setup_zone == null
+              moves.push(chunk_data)
+            else # We are in a setup zone!
+              if chunk_data != null # No need for this modification to a pass
+                modify = 3 % setup_zone # how do we modify this value? 0 = black turn, 1 = white, 2 = removal
+                if modify == 2 # Removal
+                  chunk_data *= -1 # Move into the negatives to flag a removal
+                else
+                  chunk_data += board_size ** 2 # Larger than board to flag placement without rules
+              setup_zone += 1
+              moves.push(chunk_data) # Add our modified chunk data
       @mode = mode
       @board_size = board_size
       @moves = moves
@@ -117,16 +132,13 @@ class Game_Data
       if node.AB or node.AW
         AB = node.AB or []
         AW = node.AW or []
-        for i in [0 .. Math.max(AB.length, AW.length)] # Play out the sequence
-          place = [AB[i], AW[i]]
+        AE = node.AE or []
+        for i in [0 .. Math.max(AB.length, AW.length, AE.length)] # Play out the sequence
+          place = [AB[i], AW[i], AE[i]]
           p1 = place[play]
           p2 = place[(i + 1) % 2]
           moves.push(if p1 then decode_move(p1, board_size) else null)
           moves.push(if p2 then decode_move(p2, board_size) else null)
-      if node.AE # We have some stones that need removing forcefully
-        for stone in node.AE or []
-          moves.push(-1) # Mark the next stone for removal
-          moves.push(decode_move(stone))
 
       # Check for actual plays! Yay!
       move = node[colour[play]]
