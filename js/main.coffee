@@ -88,25 +88,34 @@ main = ()->
   pass_btn = document.getElementById("pass")
 
   # Load up any moves
+  forced_removal = false # Removal flag. Used for setups.
   for move in game_data.moves
-    if move == null # We have a pass
-      if game_states.length == 0 # First entry into game states
-        state = board.dump_state()
+    if move < 0
+      forced_removal = true # Trigger flag
+    else
+      forced_removal = false # Expend flag
+      if move == null # We have a pass
+        if game_states.length == 0 # First entry into game states
+          state = board.dump_state()
+        else
+          state = game_states[game_states.length - 2] # Repeat last gamestate
       else
-        state = game_states[game_states.length - 2] # Copy last gamestate
-    else
-      state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1])
-    game_states.push(state) # Add state to list of states
+        if forced_removal
+          board.place(move, 0)
+          state = board.dump_state()
+        else
+          state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1])
+      game_states.push(state) # Add state to list of states
 
-    # Initialize browser history following game
-    window.document.title = "Move #{game_states.length}"
-    game_data.current = game_states.length
-    state_url = "#{url[0]}##{game_data.write_id()}"
-    if game_data.current == 0
-      history.replaceState(game_states.length, "Start", state_url)
-    else
-      history.pushState(game_states.length, "Move #{game_data.current}", state_url)
-    update_tinyurl()
+      # Initialize browser history following game
+      window.document.title = "Move #{game_states.length}"
+      game_data.current = game_states.length
+      state_url = "#{url[0]}##{game_data.write_id()}"
+      if game_data.current == 0
+        history.replaceState(game_states.length, "Start", state_url)
+      else
+        history.pushState(game_states.length, "Move #{game_data.current}", state_url)
+      update_tinyurl()
 
   # Update visuals
   board.update(game_states.length % 2 + 1)
