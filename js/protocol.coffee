@@ -167,21 +167,3 @@ class Game_Data
 
   # Export Function
 this.Game_Data = Game_Data
-
-# g = new Game_Data()
-# g.load_sgf("(;GM[1]FF[4]SZ[19]
-# GN[Eye-stealing tesuji]
-# PC[http://senseis.xmp.net/?Kombilo]AP[GoWiki:2009]
-# DT[2009-04-22]
-# C[Diagram from http://senseis.xmp.net/?Kombilo
-#
-# Eye-stealing tesuji]
-# PL[B]
-#
-# AB[ik]
-# AW[ii][ji][kj][kk]
-#
-#
-# ;
-# )
-# ")
