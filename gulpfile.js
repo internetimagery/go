@@ -21,8 +21,8 @@ gulp.task("watch", function(){
 // Put together a distribution
 gulp.task("default", ["html", "js", "css", "img"]);
 
-// Upload to gh-Pages
-gulp.task("upload", ["default", "release"], function(){
+// Upload to gh-Pages. Put together the distro first!
+gulp.task("upload", ["release"], function(){
   gulp.src("./dist/**/*")
   .pipe(pages({force: true, push: true}))
 });
