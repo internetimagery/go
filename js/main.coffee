@@ -94,15 +94,13 @@ main = ()->
         state = board.dump_state()
       else
         state = game_states[game_states.length - 2] # Repeat last gamestate
+    else if Array.isArray(move) # Board setup
+      board.place(m, 1) for m in (move[0] or []) # Black
+      board.place(m, 2) for m in (move[1] or []) # White
+      board.place(m, 0) for m in (move[2] or []) # Empty
+      state = board.dump_state()
     else
-      if move < 0 # We are requesting a forced Removal
-        board.place(move * -1, 0)
-        state = board.dump_state()
-      else if move > board.board_size ** 2 # We are requesting a forced addition
-        board.place(move, game_states.length % 2 + 1)
-        state = board.dump_state()
-      else
-        state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1])
+      state = play_stone(game_states.length % 2 + 1, move, board, game_states[game_states.length - 1])
     game_states.push(state) # Add state to list of states
 
     # Initialize browser history following game

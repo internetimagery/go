@@ -9,7 +9,8 @@
   # - Next two digits refer to board size. Limit 3 - 52 size.
   # - Split the following digits into chunks of 2. Chunks represent a turn each.
   # - Turns in chronilogical order
-  # - Special cases: "[]" is a pass. Moves in "()" are setups. Rules don't apply to these moves and they replace whatever already exists on the board.
+  # - Special cases: "[]" is a pass. Moves in "()" are setups. Game rules don't apply to these moves and they replace whatever already exists on the board.
+  # - "()" Sections are divided through passes "[]". Black, White, Removal
   # - Decoded. Moves are an int each. Null for a pass. Negative moves are forced subtraction. Moves larger than boardsize ** 2 are forced addition.
   # - Turn limit of 973
   # - Number of turns and current game state can be determined by looking at the history
@@ -55,8 +56,15 @@ class Game_Data
  # Get ID that represents game viewable.
   write_id: ()->
     size = "00#{@board_size}"[-2 ..]
-    moves = (encode_move(move, @board_size) for move in @moves)[... @current].join("")
-    return @mode + size + moves
+    moves = []
+    for i in [0 ... @current]
+      move = @moves[i]
+      if Array.isArray(move) # We have a forced placement
+        placement = ((encode_move(b, @board_size) for b in a).join("") for a in move)
+        moves.push("(#{placement.join(encode_move(null, @board_size))})")
+      else
+        moves.push(encode_move(move, @board_size))
+    return @mode + size + moves.join("")
 # Load a game ID into the object
   read_id: (id)->
     if id.length >= 3 # Check we have something.
@@ -81,12 +89,20 @@ class Game_Data
       cell_num = board_size ** 2 # Number of cells in board (square)
       moves = []
       buffer = []
-      setup_zone = null
+      placement_bucket = [] # All our placement requests. Black / White / Removal
+      placement_buffer = []
+      placement_zone = false
       for char in [0 ... turns.length]
         if turns[char] == "("
-          setup_zone = 0 # We are in the special zone
+          placement_zone = true # We are in the special zone
+          placement_bucket = [] # Init our buckets
+          placement_section = [] # Section we're working with
         else if turns[char] == ")"
-          setup_zone = null # We have left the zone
+          placement_zone = false # We have left the zone
+          placement_bucket.push(placment_buffer)
+          for i in [0 ... 3 - placement_bucket.length] # Ensure we have a grouping of three
+            placement_bucket.push([])
+          moves.push(placement_bucket) # Add final move list
         else if buffer.length != 2
           buffer.push(turns[char])
         else
@@ -95,17 +111,14 @@ class Game_Data
           if isNaN(chunk_data) or (chunk_data != null and chunk_data > cell_num)
             throw "Invalid Turn @ #{moves.length}."
           else
-            if setup_zone == null
+            if placement_zone # We are performing a placement setup
+              if chunk_data == null # moving to next placement section
+                placement_bucket.push(placement_section)
+                placement_section = [] # Reset
+              else
+                placement_section.push(chunk_data) # Add to section
+            else
               moves.push(chunk_data)
-            else # We are in a setup zone!
-              if chunk_data != null # No need for this modification to a pass
-                modify = 3 % setup_zone # how do we modify this value? 0 = black turn, 1 = white, 2 = removal
-                if modify == 2 # Removal
-                  chunk_data *= -1 # Move into the negatives to flag a removal
-                else
-                  chunk_data += board_size ** 2 # Larger than board to flag placement without rules
-              setup_zone += 1
-              moves.push(chunk_data) # Add our modified chunk data
       @mode = mode
       @board_size = board_size
       @moves = moves
@@ -126,24 +139,24 @@ class Game_Data
     game.first() # Move to start
     for i in [0 ... game.totalMoves()]
       node = game.node() # Get the current node
-      play = i % 2
 
       # Check for forced placement nodes. Booo!
-      if node.AB or node.AW
-        AB = node.AB or []
-        AW = node.AW or []
-        AE = node.AE or []
-        for i in [0 .. Math.max(AB.length, AW.length, AE.length)] # Play out the sequence
-          place = [AB[i], AW[i], AE[i]]
-          p1 = place[play]
-          p2 = place[(i + 1) % 2]
-          moves.push(if p1 then decode_move(p1, board_size) else null)
-          moves.push(if p2 then decode_move(p2, board_size) else null)
+      if node.AB or node.AW or node.AE
+        forced = [
+          (decode_move(m, board_size) for m in node.AB or [])
+          (decode_move(m, board_size) for m in node.AW or [])
+          (decode_move(m, board_size) for m in node.AE or [])
+        ]
+        moves.push(forced)
 
       # Check for actual plays! Yay!
-      move = node[colour[play]]
-      move = "[]" if move == "[tt]" or not move # Support FF[3] passing.
-      moves.push(decode_move(move, board_size))
+      if node.W or node.B
+        move = node[colour[i % 2]]
+        if not move # We're at the wrong move. Insert a pass to put us back on track
+          moves.push(null)
+          move = node[colour[(i + 1) % 2]]
+        move = "[]" if move == "[tt]" # Support FF[3] passing.
+        moves.push(decode_move(move, board_size))
 
     @mode = mode
     @board_size = board_size
