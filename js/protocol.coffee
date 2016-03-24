@@ -9,7 +9,7 @@
   # - Next two digits refer to board size. Limit 3 - 52 size.
   # - Split the following digits into chunks of 2. Chunks represent a turn each.
   # - Turns in chronilogical order
-  # - Special cases: "[]" is a pass. "--" the following stone is to be removed
+  # - Special cases: "[]" is a pass. Moves in "()" are setups. Rules don't apply and they're played out as Black, White, Removal
   # - Turn limit of 973
   # - Number of turns and current game state can be determined by looking at the history
   # - Current player is determined by turn number
@@ -23,8 +23,6 @@ move_chars = ["a","b","c","d","e","f","g","h","i","j","k","l","m",
 decode_move = (move, size)->
   if move == "[]" # A Pass
     return null
-  else if move == "--" # Marking next stone for forced removal
-    return -1
   else
     row = move_chars.indexOf(move[0]) * size
     col = move_chars.indexOf(move[1])
@@ -36,8 +34,6 @@ decode_move = (move, size)->
 encode_move = (move, size)->
   if move == null # A Pass
     return "[]"
-  else if move < 0 # Stone marked for forced removal
-    return "--"
   else
     row = move_chars[move // size]
     col = move_chars[move % size]
@@ -83,13 +79,18 @@ class Game_Data
 
       cell_num = board_size ** 2 # Number of cells in board (square)
       moves = []
-      for chunk in [0 ... turns.length / 2]
-        chunk *= 2
-        chunk_data = decode_move(turns[chunk ... chunk + 2], board_size)
-        if isNaN(chunk_data) or (chunk_data != null and chunk_data > cell_num)
-          throw "Invalid Turn @ #{chunk / 3}."
+      buffer = []
+      for char in [0 ... turns.length]
+        if char == "(" or char == ")" # We are in a special zone
+          continue # TODO: Add in special case code here
+        else if buffer.length != 2
+          buffer.push(char)
         else
-          moves.push(chunk_data)
+          chunk_data = decode_move(buffer.join(""), board_size)
+          if isNaN(chunk_data) or (chunk_data != null and chunk_data > cell_num)
+            throw "Invalid Turn @ #{moves.length}."
+          else
+            moves.push(chunk_data)
       @mode = mode
       @board_size = board_size
       @moves = moves
