@@ -97,6 +97,10 @@ main = ()->
     update_tinyurl()
 
   # Initialize our board and controls
+  slider = new Slider(document.getElementById("slider-handle"))
+  slider.set_segment_count(5)
+  slider.set_pos(3)
+  slider.callback = (seg)-> console.log "Changed to segment!", seg
   board = new Board(document.getElementById("board"), game_data.board_size)
   pass_btn = document.getElementById("pass")
 

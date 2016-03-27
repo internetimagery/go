@@ -1,18 +1,21 @@
 /*Gui related styles*/
 
-#slider-wrapper {
-  background: green;
-  height: 40px;
-  width: 50%;
-  margin-top: 100px;
+#slider-outer {
+  background: darkgrey;
+  box-shadow: inset 0px 1px 0px 1px rgba(0, 0, 0, 0.5);;
+  height: 6px;
+  width: 100%;
+  margin-top: 5%;
   position: relative;
 }
 
-#slider {
+#slider-handle {
   position: absolute;
-  height: 120%;
-  top: -10%;
-  background-color: blue;
-  width: 30px;
+  height: 20px;
+  top: -7px;
+  background-color: #fc3c11;
+  margin-left: -10px;
+  width: 20px;
   cursor: pointer;
+  border-radius: 50%;
 }

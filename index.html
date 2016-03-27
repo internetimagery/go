@@ -6,6 +6,7 @@
     <title>Go Board</title>
     <!-- build:style -->
     <link rel="stylesheet" href="css/board.css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="css/gui.css" media="screen" charset="utf-8">
     <!-- endbuild -->
   </head>
   <body id="dropzone">
@@ -13,12 +14,15 @@
     <div class="menu left">
       <div id="player-white" class="entry stone set white"></div>
       <div id="player-black" class="entry stone set black"></div>
-      <div id="pass" class="entry set"><strong><u>P</u>ASS</strong></div>
+      <div id="pass" class="entry"><strong><u>P</u>ASS</strong></div>
     </div>
     <a id="short-link" href="#" target="_blank">Create a Short URL</a>
     <div id="container">
       <div id="outer">
         <div id="board"></div>
+      </div>
+      <div id="slider-outer">
+        <div id="slider-handle"></div>
       </div>
     </div>
     <!-- build:scripts -->

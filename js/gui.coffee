@@ -1,21 +1,20 @@
 # Gui related things
 
-# # Make board scale to the size of the screen
-# container = document.getElementById("container")
-# size_board = ()->
-#   width = window.innerWidth or document.body.clientWidth
-#   height = window.innerHeight or document.body.clientHeight
-#   scale = Math.min(width, height)
-#   container.setAttribute("style", "width:#{scale * 0.8}px;")
-#   console.log height
-# window.onresize = size_board
-# size_board()
+# Make board scale to the size of the screen
+container = document.getElementById("container")
+size_board = ()->
+  width = window.innerWidth or document.body.clientWidth
+  height = window.innerHeight or document.body.clientHeight
+  scale = Math.min(width, height)
+  container.setAttribute("style", "width:#{scale * 0.8}px;")
+window.onresize = size_board
+size_board()
 
 # Make slider... well... slide!
 class Slider
   constructor: (@handle) ->
-    wrapper = @handle.parentNode
-    @set_segments(1)
+    @wrapper = @handle.parentNode
+    @set_segment_count(1) # Default
     # Track our state
     active_seg = 0
     dragging = false
@@ -29,7 +28,7 @@ class Slider
         offsetX = e.clientX
         dragging = true
         # Initialize our positions
-        width = wrapper.getBoundingClientRect().width - @handle.getBoundingClientRect().width
+        width = @wrapper.getBoundingClientRect().width
     # Start dragging
     document.onmouseup = (e)->
       dragging = false
@@ -43,7 +42,7 @@ class Slider
         curr_pos = width if curr_pos >= width
         scale = 1 / width
         percent = curr_pos * scale
-        @handle.setAttribute("style", "margin-left:#{percent * 100}%;") # Move slider
+        @handle.setAttribute("style", "left:#{percent * 100}%;") # Move slider
         if @segments
           seg_offset = (Math.abs(seg - percent) for seg in @seg_range)
           seg_nearest = seg_offset.reduce (a, b)-> Math.min a, b
@@ -53,11 +52,14 @@ class Slider
             @callback?(active_seg)
 
   # Set the number of segments in the slider
-  set_segments: (@segments)->
+  set_segment_count: (@segments)->
     chunk = if 1 < @segments then 1 / (@segments - 1) else 0
     @seg_range = (chunk * seg for seg in [0 ... @segments])
 
+  # Set position of handle
+  set_pos: (pos)->
+    @handle.setAttribute("style", "left:#{@seg_range[pos] * 100}%;")
 
-this.slider = new Slider(document.getElementById("slider"))
-this.slider.set_segments(5)
-this.slider.callback = (p)-> console.log "moved", p, new Date()
+
+
+this.Slider = Slider
