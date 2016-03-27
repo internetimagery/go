@@ -184,10 +184,10 @@ class Game_Data
 
       # Check for actual plays! Yay!
       if node.W or node.B
-        move = node[colour[i % 2]]
+        move = node[colour[moves.length % 2]]
         if not move # We're at the wrong move. Insert a pass to put us back on track
           moves.push(null)
-          move = node[colour[(i + 1) % 2]]
+          move = node[colour[moves.length % 2]]
         move = "[]" if move == "[tt]" # Support FF[3] passing.
         moves.push(decode_move(move, board_size))
       game.next()

@@ -21,6 +21,10 @@ indicate = (player)->
     e.setAttribute("style", "")
   element[player].setAttribute("style", "box-shadow: 0px 0px 3px 3px yellow;")
 
+# Record the current state of the game
+class Game_State
+  constructor: (@player, @state, @url) ->
+
 # Capture a group
 capture = (stone, board)->
   if board.get_player(stone) != 0 # Check in case another loop already captured this group
@@ -115,16 +119,12 @@ main = ()->
       state = board.dump_state()
     else
       state = play_stone_no_check(game_states.length % 2 + 1, move, board)
-    game_states.push(state) # Add state to list of states
+    game_data.current = game_states.length + 1
+    state_url = "#{url[0]}##{game_data.write_id()}"
+    game_states.push new Game_State game_states.length % 2, state, state_url
 
     # Initialize browser history following game
     window.document.title = "Move #{game_states.length}"
-    game_data.current = game_states.length
-    state_url = "#{url[0]}##{game_data.write_id()}"
-    if game_data.current == 0
-      history.replaceState(game_states.length, "Start", state_url)
-    else
-      history.pushState(game_states.length, "Move #{game_data.current}", state_url)
     update_tinyurl()
 
   # Update visuals
@@ -139,12 +139,13 @@ main = ()->
       current_state = if game_states.length == 0 then board.dump_state() else game_states[game_states.length - 1]
       try
         current_state = play_stone(game_data.current % 2 + 1, pos, board, game_states[game_states.length - 2])
-        game_states.push(current_state)
-        game_data.current = game_states.length
+        game_data.current = game_states.length + 1
+        data = new Game_State game_data.current % 2, current_state, "#{url[0]}##{game_data.write_id()}"
+        game_states.push data
         slider.set_segment_count game_states.length
         slider.set_pos game_states.length - 1
         game_data.add_move(pos)
-        history.pushState(game_states.length, "Move #{game_states.length}", "#{url[0]}##{game_data.write_id()}")
+        window.location.replace data.url
         board.load_state(current_state)
         player = game_data.current % 2
         board.update(player + 1) # Draw board changes
@@ -167,25 +168,14 @@ main = ()->
   # Update board to requested state
   slider.callback = (pos)->
     move = pos + 1
-    console.log "Loaded game state #{move}."
+    console.log "Viewing move #{move}."
     game_data.current = move
-    board.load_state(game_states[pos])
-    board.update(move % 2 + 1)
+    view_state = game_states[pos]
+    board.load_state(view_state.state)
+    board.update(view_state.player + 1)
     window.document.title = "Move #{move}"
-    indicate(move % 2)
-    update_tinyurl()
-
-  # Update board to requested state
-  window.addEventListener "popstate", (event)->
-    move = parseInt(event.state)
-    if isNaN(move)
-      throw "Invalid game state!"
-    console.log "Loaded game state #{move}."
-    game_data.current = move
-    board.load_state(game_states[move - 1])
-    board.update(move % 2 + 1)
-    window.document.title = "Move #{move}"
-    indicate(move % 2)
+    window.location.replace(view_state.url)
+    indicate(view_state.player)
     update_tinyurl()
 
   # Load SGF files
