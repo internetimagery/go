@@ -19,8 +19,8 @@ class Slider
     active_seg = 0
     dragging = false
     offsetX = 0 # Track how far our mouse has moved
-    width = null # Test the boundaries of our slider
-    handle_pos = 0 # Where are we in the slider?
+    scale = 0 # Test the boundaries of our slider
+    @handle_pos = 0 # Where are we in the slider?
     curr_pos = 0
     # Set our functionality
     @handle.onmousedown = (e)=>
@@ -29,22 +29,22 @@ class Slider
         dragging = true
         # Initialize our positions
         width = @wrapper.getBoundingClientRect().width
+        scale = if width then 1 / width else 0
     # Start dragging
     document.onmouseup = (e)->
-      dragging = false
-      handle_pos = curr_pos
+      if dragging
+        dragging = false
+        @handle_pos = curr_pos
     # Drag
     document.onmousemove = (e)=>
       if dragging and e.buttons == 1
-        move = e.clientX - offsetX
-        curr_pos = handle_pos + move
+        move = (e.clientX - offsetX) * scale
+        curr_pos = @handle_pos + move
         curr_pos = 0 if curr_pos <= 0
-        curr_pos = width if curr_pos >= width
-        scale = 1 / width
-        percent = curr_pos * scale
-        @handle.setAttribute("style", "left:#{percent * 100}%;") # Move slider
+        curr_pos = 1 if curr_pos >= 1
+        @handle.setAttribute("style", "left:#{curr_pos * 100}%;") # Move slider
         if @segments
-          seg_offset = (Math.abs(seg - percent) for seg in @seg_range)
+          seg_offset = (Math.abs(seg - curr_pos) for seg in @seg_range)
           seg_nearest = seg_offset.reduce (a, b)-> Math.min a, b
           curr_seg = seg_offset.indexOf(seg_nearest)
           if active_seg != curr_seg
@@ -58,7 +58,11 @@ class Slider
 
   # Set position of handle
   set_pos: (pos)->
-    @handle.setAttribute("style", "left:#{@seg_range[pos] * 100}%;")
+    if @seg_range?
+      @handle.setAttribute("style", "left:#{@seg_range[pos] * 100}%;")
+      @handle_pos = @seg_range[pos]
+
+
 
 
 

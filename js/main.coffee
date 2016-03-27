@@ -98,9 +98,6 @@ main = ()->
 
   # Initialize our board and controls
   slider = new Slider(document.getElementById("slider-handle"))
-  slider.set_segment_count(5)
-  slider.set_pos(3)
-  slider.callback = (seg)-> console.log "Changed to segment!", seg
   board = new Board(document.getElementById("board"), game_data.board_size)
   pass_btn = document.getElementById("pass")
 
@@ -133,6 +130,8 @@ main = ()->
   # Update visuals
   board.update(game_states.length % 2 + 1)
   indicate(game_states.length % 2)
+  slider.set_segment_count game_states.length
+  slider.set_pos game_states.length - 1
 
   # Allow the player to place stones!
   board.register (pos)->
@@ -142,6 +141,8 @@ main = ()->
         current_state = play_stone(game_data.current % 2 + 1, pos, board, game_states[game_states.length - 2])
         game_states.push(current_state)
         game_data.current = game_states.length
+        slider.set_segment_count game_states.length
+        slider.set_pos game_states.length - 1
         game_data.add_move(pos)
         history.pushState(game_states.length, "Move #{game_states.length}", "#{url[0]}##{game_data.write_id()}")
         board.load_state(current_state)
@@ -162,6 +163,17 @@ main = ()->
   document.addEventListener "keypress", (e)->
     if e.key == "p"
       board.placement_event(null)
+
+  # Update board to requested state
+  slider.callback = (pos)->
+    move = pos + 1
+    console.log "Loaded game state #{move}."
+    game_data.current = move
+    board.load_state(game_states[pos])
+    board.update(move % 2 + 1)
+    window.document.title = "Move #{move}"
+    indicate(move % 2)
+    update_tinyurl()
 
   # Update board to requested state
   window.addEventListener "popstate", (event)->
