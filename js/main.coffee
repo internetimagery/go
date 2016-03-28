@@ -18,7 +18,7 @@ indicate = (player)->
 
 # Record the current state of the game
 class Game_State
-  constructor: (@player, @state, @url) ->
+  constructor: (@player, @state, @id) ->
 
 # Helper for updating URL and keeping things in sync
 class Window_URL
@@ -117,7 +117,7 @@ main = ()->
       if game_states.length == 0 # First entry into game states
         state = board.dump_state()
       else
-        state = game_states[game_states.length - 2] # Repeat last gamestate
+        state = game_states[game_states.length - 2].state # Repeat last gamestate
     else if Array.isArray(move) # Board setup
       board.place(m, 1) for m in (move[0] or []) # Black
       board.place(m, 2) for m in (move[1] or []) # White
@@ -128,11 +128,8 @@ main = ()->
     game_data.current = game_states.length + 1
     game_states.push new Game_State game_states.length % 2, state, game_data.write_id()
 
-    # Initialize browser history following game
-    window.document.title = "Move #{game_states.length}"
-    URL.update href[1] # Force update to the same URL to get everything in sync
-
   # Update visuals
+  URL.update href[1] # Force update to the same URL to get everything in sync
   board.update(game_states.length % 2 + 1)
   indicate(game_states.length % 2)
   slider.set_segment_count game_states.length
@@ -141,13 +138,13 @@ main = ()->
   # Load the board state at a certain point in time
   load_board_snapshot = (move)->
     if 0 <= move < game_states.length
-      state = game_states[move] # Get the requested board state
+      vis_state = game_states[move] # Get the requested board state
       game_data.current = move + 1 # Keep our data in sync
-      URL.update state.url # Update our URL to match what we see
+      URL.update vis_state.id # Update our URL to match what we see
       window.document.title = "Move #{move + 1}" # Tell us where we are
-      board.load_state state.state # Load in our board data
-      board.update(state.player + 1)
-      indicate(state.player) # Highlight the current players turn.
+      board.load_state vis_state.state # Load in our board data
+      board.update(vis_state.player + 1)
+      indicate(vis_state.player) # Highlight the current players turn.
       console.log "Viewing move #{move + 1}."
       return true
 
@@ -159,9 +156,8 @@ main = ()->
         current_state = play_stone(game_data.current % 2 + 1, pos, board, game_states[game_states.length - 2])
         game_data.current = game_states.length + 1
         game_data.add_move(pos)
-        data = new Game_State game_data.current % 2, current_state, game_data.write_id()
-        game_states.push data
-        slider.set_segment_count game_states.length
+        game_states.push new Game_State game_data.current % 2, current_state, game_data.write_id()
+        slider.set_segment_count game_states.length # Increase slider size
         load_board_snapshot game_states.length - 1
       catch error
         board.load_state(current_state) # Undo
@@ -175,24 +171,25 @@ main = ()->
     board.placement_event(null)
 
   # Hotkeys
-  document.addEventListener "keypress", (e)->
-    switch e.key
-      when "p" then board.placement_event(null) # Pass
-      when "ArrowLeft"
-        step = -1
-      when "ArrowRight"
-        step = 1
+  document.onkeydown = (e)->
+    e = window.event if not e
+    code = e.keyCode
+    if e.charCode and code == 0
+      code = e.charCode
+    switch code
+      when 80 then board.placement_event null # Pass, (letter "P")
+      when 37 then step = -1 # Left button
+      when 39 then step = 1 # Right button
 
-    # Move back or forward one move
     if step?
       new_step = game_data.current - 1 + step
       if load_board_snapshot new_step
         slider.set_pos new_step
+    e.preventDefault()
 
   # Update board to requested state
   slider.callback = (pos)->
     load_board_snapshot pos, true
-
 
   # Load SGF files
   dropzone = document.getElementById("dropzone") # Drop element
