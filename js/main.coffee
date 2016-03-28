@@ -138,6 +138,19 @@ main = ()->
   slider.set_segment_count game_states.length
   slider.set_pos game_states.length - 1
 
+  # Load the board state at a certain point in time
+  load_board_snapshot = (move)->
+    if 0 <= move < game_states.length
+      state = game_states[move] # Get the requested board state
+      game_data.current = move + 1 # Keep our data in sync
+      URL.update state.url # Update our URL to match what we see
+      window.document.title = "Move #{move + 1}" # Tell us where we are
+      board.load_state state.state # Load in our board data
+      board.update(state.player + 1)
+      indicate(state.player) # Highlight the current players turn.
+      console.log "Viewing move #{move + 1}."
+      return true
+
   # Allow the player to place stones!
   board.register (pos)->
     if game_data.current == game_states.length # Only add moves to the end of the game
@@ -148,15 +161,8 @@ main = ()->
         game_data.add_move(pos)
         data = new Game_State game_data.current % 2, current_state, game_data.write_id()
         game_states.push data
-        game_data.current = game_states.length
         slider.set_segment_count game_states.length
-        slider.set_pos game_states.length - 1
-        URL.update data.url
-        board.load_state(current_state)
-        player = game_data.current % 2
-        board.update(player + 1) # Draw board changes
-        window.document.title = "Move #{game_states.length}"
-        indicate(player)
+        load_board_snapshot game_states.length - 1
       catch error
         board.load_state(current_state) # Undo
         alert error
@@ -167,21 +173,26 @@ main = ()->
   # Play a passing move
   pass_btn.onclick = (e)->
     board.placement_event(null)
+
+  # Hotkeys
   document.addEventListener "keypress", (e)->
-    if e.key == "p"
-      board.placement_event(null)
+    switch e.key
+      when "p" then board.placement_event(null) # Pass
+      when "ArrowLeft"
+        step = -1
+      when "ArrowRight"
+        step = 1
+
+    # Move back or forward one move
+    if step?
+      new_step = game_data.current - 1 + step
+      if load_board_snapshot new_step
+        slider.set_pos new_step
 
   # Update board to requested state
   slider.callback = (pos)->
-    move = pos + 1
-    console.log "Viewing move #{move}."
-    game_data.current = move
-    view_state = game_states[pos]
-    board.load_state(view_state.state)
-    board.update(view_state.player + 1)
-    window.document.title = "Move #{move}"
-    URL.update view_state.url
-    indicate(view_state.player)
+    load_board_snapshot pos, true
+
 
   # Load SGF files
   dropzone = document.getElementById("dropzone") # Drop element
