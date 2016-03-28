@@ -7,6 +7,7 @@
   width: 100%;
   margin-top: 5%;
   position: relative;
+  border-radius: 20%;
 }
 
 #slider-handle {
