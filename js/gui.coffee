@@ -10,6 +10,30 @@ size_board = ()->
 window.onresize = size_board
 size_board()
 
+# Helper for updating URL and keeping things in sync
+class Window_URL
+  constructor: (@base)->
+    @tiny_url = document.getElementById("short-link")
+  update: (hash)->
+    url = "#{@base}##{hash}"
+    window.location.replace url
+    # Update tiny-url link
+    @tiny_url.href = "https://tinyurl.com/api-create.php?url=#{encodeURIComponent(url)}"
+
+class Corner_GUI
+  constructor: () ->
+    @pass_btn = document.getElementById("pass")
+    @Player_indicators = [
+      document.getElementById("player-black"),
+      document.getElementById("player-white")]
+    @pass_btn.onclick = (e)=>
+      @pass_callback?(e)
+  # Indicate which players turn it is
+  indicate: (player)->
+    for e in @Player_indicators
+      e.setAttribute("style", "")
+    @Player_indicators[player].setAttribute("style", "box-shadow: 0px 0px 3px 3px yellow;")
+
 # Make slider... well... slide!
 class Slider
   constructor: (@handle) ->
@@ -66,5 +90,6 @@ class Slider
 
 
 
-
+this.Window_URL = Window_URL
 this.Slider = Slider
+this.Corner_GUI = Corner_GUI

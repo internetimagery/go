@@ -2,29 +2,9 @@
 
 # TODO: add gnugpg signing option to url for authenticity "https://openpgpjs.org/"
 
-
-# Small player indicator
-indicate = (player)->
-  element = [
-    document.getElementById("player-black"),
-    document.getElementById("player-white")]
-  for e in element
-    e.setAttribute("style", "")
-  element[player].setAttribute("style", "box-shadow: 0px 0px 3px 3px yellow;")
-
 # Record the current state of the game
 class Game_State
   constructor: (@player, @state, @id) ->
-
-# Helper for updating URL and keeping things in sync
-class Window_URL
-  constructor: (@base)->
-    @tiny_url = document.getElementById("short-link")
-  update: (hash)->
-    url = "#{@base}##{hash}"
-    window.location.replace url
-    # Update tiny-url link
-    @tiny_url.href = "https://tinyurl.com/api-create.php?url=#{encodeURIComponent(url)}"
 
 # Capture a group
 capture = (stone, board)->
@@ -103,8 +83,8 @@ main = ()->
 
   # Initialize our board and controls
   slider = new Slider(document.getElementById("slider-handle"))
+  corner_gui = new Corner_GUI()
   board = new Board(document.getElementById("board"), game_data.board_size)
-  pass_btn = document.getElementById("pass")
 
   # Load up any moves
   for move in game_data.moves
@@ -126,7 +106,7 @@ main = ()->
   # Update visuals
   URL.update href[1] # Force update to the same URL to get everything in sync
   board.update(game_states.length % 2 + 1)
-  indicate(game_states.length % 2)
+  corner_gui.indicate(game_states.length % 2)
   slider.set_segment_count game_states.length
   slider.set_pos game_states.length - 1
 
@@ -139,7 +119,7 @@ main = ()->
       window.document.title = "Move #{move + 1}" # Tell us where we are
       board.load_state vis_state.state # Load in our board data
       board.update(vis_state.player + 1)
-      indicate(vis_state.player) # Highlight the current players turn.
+      corner_gui.indicate(vis_state.player) # Highlight the current players turn.
       console.log "Viewing move #{move + 1}."
       return true
 
@@ -162,7 +142,7 @@ main = ()->
       alert "Cannot add move. The game has progressed past this point."
 
   # Play a passing move
-  pass_btn.onclick = (e)->
+  corner_gui.pass_callback = (e)->
     board.placement_event(null)
 
   # Hotkeys
