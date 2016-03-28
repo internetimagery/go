@@ -120,8 +120,7 @@ main = ()->
     else
       state = play_stone_no_check(game_states.length % 2 + 1, move, board)
     game_data.current = game_states.length + 1
-    state_url = "#{url[0]}##{game_data.write_id()}"
-    game_states.push new Game_State game_states.length % 2, state, state_url
+    game_states.push new Game_State game_states.length % 2, state, game_data.write_id()
 
     # Initialize browser history following game
     window.document.title = "Move #{game_states.length}"
@@ -136,16 +135,17 @@ main = ()->
   # Allow the player to place stones!
   board.register (pos)->
     if game_data.current == game_states.length # Only add moves to the end of the game
-      current_state = if game_states.length == 0 then board.dump_state() else game_states[game_states.length - 1]
+      current_state = if game_states.length == 0 then board.dump_state() else game_states[game_states.length - 1].state
       try
-        current_state = play_stone(game_data.current % 2 + 1, pos, board, game_states[game_states.length - 2])
+        current_state = play_stone(game_data.current % 2 + 1, pos, board, game_states[game_states.length - 2].state)
         game_data.current = game_states.length + 1
-        data = new Game_State game_data.current % 2, current_state, "#{url[0]}##{game_data.write_id()}"
+        game_data.add_move(pos)
+        data = new Game_State game_data.current % 2, current_state, game_data.write_id()
         game_states.push data
+        game_data.current = game_states.length
         slider.set_segment_count game_states.length
         slider.set_pos game_states.length - 1
-        game_data.add_move(pos)
-        window.location.replace data.url
+        window.location.replace "#{url[0]}##{data.url}"
         board.load_state(current_state)
         player = game_data.current % 2
         board.update(player + 1) # Draw board changes
@@ -155,6 +155,7 @@ main = ()->
       catch error
         board.load_state(current_state) # Undo
         alert error
+        console.error error
     else
       alert "Cannot add move. The game has progressed past this point."
 
@@ -174,7 +175,7 @@ main = ()->
     board.load_state(view_state.state)
     board.update(view_state.player + 1)
     window.document.title = "Move #{move}"
-    window.location.replace(view_state.url)
+    window.location.replace("#{url[0]}##{view_state.url}")
     indicate(view_state.player)
     update_tinyurl()
 

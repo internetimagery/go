@@ -1,4 +1,4 @@
-# Game board 
+# Game board
 
 # Size element
 Resize = (x, y, w, h, style)->

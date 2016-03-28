@@ -4,6 +4,10 @@ body {
   background-image: url("../img/struckaxiom.png");
 }
 
+html, body {
+  height: 100%;
+}
+
 @media only screen and (max-width: 1026px) {
     #github-banner {
         display: none;
