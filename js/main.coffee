@@ -181,7 +181,7 @@ main = ()->
       when 37 then step = -1 # Left button
       when 39 then step = 1 # Right button
 
-    if step?
+    if step? # Move through the game one move at a time
       new_step = game_data.current - 1 + step
       if load_board_snapshot new_step
         slider.set_pos new_step

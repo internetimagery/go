@@ -37,6 +37,7 @@ class Slider
     # Drag
     document.onmousemove = (e)=>
       if dragging and e.buttons == 1
+        e.preventDefault()
         move = (e.clientX - offsetX) * scale
         @curr_pos = @handle_pos + move
         @curr_pos = 0 if @curr_pos <= 0
