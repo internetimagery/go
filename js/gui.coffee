@@ -25,6 +25,7 @@ class Slider
     # Set our functionality
     @handle.onmousedown = (e)=>
       if e.buttons == 1 # Left mouse button
+        e.preventDefault()
         offsetX = e.clientX
         dragging = true
         # Initialize our positions

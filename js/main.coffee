@@ -1,9 +1,5 @@
 # Game Code
 
-# TEST LAYOUT
-#05001002005008007012011
-#05---001002005008007012011---004006
-
 # TODO: add gnugpg signing option to url for authenticity "https://openpgpjs.org/"
 
 
@@ -92,8 +88,7 @@ play_stone = (player, pos, board, ko_check_move)->
 main = ()->
 
   # Start by getting some game data
-  game_data = new Game_Data()
-
+  game_data = new Game_Data() # Track raw data for game
   game_states = [] # Record the state of the game as we progress
 
   # Parse ID from url
@@ -182,10 +177,10 @@ main = ()->
       when 39 then step = 1 # Right button
 
     if step? # Move through the game one move at a time
+      e.preventDefault()
       new_step = game_data.current - 1 + step
       if load_board_snapshot new_step
         slider.set_pos new_step
-    e.preventDefault()
 
   # Update board to requested state
   slider.callback = (pos)->
