@@ -115,14 +115,14 @@ html, body {
   background-color: rgb(60, 60, 60);;
 }
 
-.empty-white:hover {
+.play-white .empty:hover {
   background-image: radial-gradient(
     rgba(255, 255, 255, 1) 50%,
     rgba(255, 255, 255, 0) 50.1%
     );
 }
 
-.empty-black:hover {
+.play-black .empty:hover {
   background-image: radial-gradient(
     rgba(0, 0, 0, 1) 50%,
     rgba(0, 0, 0, 0) 50.1%

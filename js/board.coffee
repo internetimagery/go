@@ -19,8 +19,8 @@ class Board
       "empty", # Completely empty
       "stone set black",
       "stone set white", # White stone on board
-      "empty-black",
-      "empty-white" # Empty hover pieces
+      "play-black",
+      "play-white" # Empty hover pieces
     ]
     @board_state = []
     if @size < 2
@@ -31,18 +31,18 @@ class Board
     stone_size = grid_chunk * 0.9
     star_size = stone_size * 0.2
 
-    # Create an inner frame, smaller than the board, so our stones don't fall off the sides
-    inner = Create("grid", element)
+    # Create an @grid frame, smaller than the board, so our stones don't fall off the sides
+    @grid = Create("grid", element)
     inner_frame_pos = stone_size * 0.6
     inner_frame_span = 100 - inner_frame_pos * 2
-    inner.resize(inner_frame_pos, inner_frame_pos, inner_frame_span, inner_frame_span, "position:relative;")
-    element.appendChild(inner)
+    @grid.resize(inner_frame_pos, inner_frame_pos, inner_frame_span, inner_frame_span, "position:relative;")
+    element.appendChild(@grid)
 
     for row in [0 ... @size]
-      Create("line-horiz", inner).setAttribute("style", "top:#{row * grid_chunk}%;")
+      Create("line-horiz", @grid).setAttribute("style", "top:#{row * grid_chunk}%;")
 
     for col in [0 ... @size]
-      Create("line-vert", inner).setAttribute("style", "left:#{col * grid_chunk}%;")
+      Create("line-vert", @grid).setAttribute("style", "left:#{col * grid_chunk}%;")
 
     # Add placeholder positions to place stones
     @sockets = []
@@ -66,9 +66,9 @@ class Board
       for row in [0 ... @size]
         for star in stars
           if star[0] == row and star[1] == col
-            star = Create("star", inner)
+            star = Create("star", @grid)
             star.resize(row * grid_chunk - star_size * 0.5, col * grid_chunk - star_size * 0.5, star_size, star_size, "position:absolute;")
-        socket = Create("empty", inner)
+        socket = Create("empty", @grid)
         socket.player = 0
         socket.resize(row * grid_chunk - stone_size * 0.5, col * grid_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;")
         do ()=>
@@ -105,12 +105,11 @@ class Board
 
   # Update board to current state.
   update: (player)->
+    @grid.setAttribute("class", "grid #{@stone_class[player + 2]}")
     for pos in [0 ... @sockets.length]
       if @board_state[pos] != @sockets[pos].player # Check for differences in setup
         @sockets[pos].setAttribute("class", @stone_class[@board_state[pos]])
         @sockets[pos].player = @board_state[pos]
-      if @sockets[pos].player == 0
-        @sockets[pos].setAttribute("class", @stone_class[player + 2])
 
   # UTILITY
 

@@ -3,7 +3,7 @@
 # TODO: add gnugpg signing option to url for authenticity "https://openpgpjs.org/"
 
 # Record the current state of the game
-class Game_State
+class Game_Snapshot
   constructor: (@player, @state, @id) ->
 
 # Capture a group
@@ -101,7 +101,7 @@ main = ()->
     else
       state = play_stone_no_check(game_states.length % 2 + 1, move, board)
     game_data.current = game_states.length + 1
-    game_states.push new Game_State game_states.length % 2, state, game_data.write_id()
+    game_states.push new Game_Snapshot game_states.length % 2, state, game_data.write_id()
 
   # Update visuals
   URL.update href[1] # Force update to the same URL to get everything in sync
@@ -131,7 +131,7 @@ main = ()->
         current_state = play_stone(game_data.current % 2 + 1, pos, board, game_states[game_states.length - 2])
         game_data.current = game_states.length + 1
         game_data.add_move(pos)
-        game_states.push new Game_State game_data.current % 2, current_state, game_data.write_id()
+        game_states.push new Game_Snapshot game_data.current % 2, current_state, game_data.write_id()
         slider.set_segment_count game_states.length # Increase slider size
         load_board_snapshot game_states.length - 1
       catch error
