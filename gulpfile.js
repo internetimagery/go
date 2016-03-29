@@ -54,6 +54,9 @@ gulp.task("js", function(){
   // Shrink
   .pipe(uglify())
   .pipe(gulp.dest("./dist/js"))
+
+  gulp.src("./js/vendor/*")
+  .pipe(gulp.dest("./dist/vendor"))
 });
 
 gulp.task("css", function(){

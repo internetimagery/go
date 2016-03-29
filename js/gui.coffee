@@ -26,7 +26,8 @@ class Corner_GUI
     @Player_indicators = [
       document.getElementById("player-black"),
       document.getElementById("player-white")]
-    @pass_btn.onclick = (e)=>
+    @pass_btn.addEventListener "touchstart", (e)=>
+      e.preventDefault()
       @pass_callback?(e)
   # Indicate which players turn it is
   indicate: (player)->
@@ -40,30 +41,30 @@ class Slider
     @wrapper = @handle.parentNode
     @set_segment_count(1) # Default
     # Track our state
-    active_seg = 0
+    @active_seg = 0
     dragging = false
     offsetX = 0 # Track how far our mouse has moved
     scale = 0 # Test the boundaries of our slider
     @handle_pos = 0 # Where are we in the slider?
     @curr_pos = 0
-    # Set our functionality
-    @handle.onmousedown = (e)=>
-      if e.buttons == 1 # Left mouse button
-        e.preventDefault()
-        offsetX = e.clientX
-        dragging = true
-        # Initialize our positions
-        width = @wrapper.getBoundingClientRect().width
-        scale = if width then 1 / width else 0
-    # Start dragging
-    document.onmouseup = (e)=>
-      dragging = false
-      @handle_pos = @curr_pos
+
+    # Grab handle
+    @handle.addEventListener "touchstart", (e)=>
+      dragging = true
+      offsetX = if e.clientX? then e.clientX else e.changedTouches[0].clientX
+      e.stopPropagation()
+      e.preventDefault()
+      # Initialize our positions
+      width = @wrapper.getBoundingClientRect().width
+      scale = if width then 1 / width else 0
+
     # Drag
-    document.onmousemove = (e)=>
-      if dragging and e.buttons == 1
+    document.addEventListener "touchmove", (e)=>
+      if dragging
+        e.stopPropagation()
         e.preventDefault()
-        move = (e.clientX - offsetX) * scale
+        currX = if e.clientX? then e.clientX else e.changedTouches[0].clientX
+        move = (currX - offsetX) * scale
         @curr_pos = @handle_pos + move
         @curr_pos = 0 if @curr_pos <= 0
         @curr_pos = 1 if @curr_pos >= 1
@@ -72,9 +73,14 @@ class Slider
           seg_offset = (Math.abs(seg - @curr_pos) for seg in @seg_range)
           seg_nearest = seg_offset.reduce (a, b)-> Math.min a, b
           curr_seg = seg_offset.indexOf(seg_nearest)
-          if active_seg != curr_seg
-            active_seg = curr_seg
-            @callback?(active_seg)
+          if @active_seg != curr_seg
+            @active_seg = curr_seg
+            @callback?(@active_seg)
+
+    # End dragging
+    document.addEventListener "touchend", (e)=>
+      dragging = false
+      @handle_pos = @curr_pos
 
   # Set the number of segments in the slider
   set_segment_count: (@segments)->

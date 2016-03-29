@@ -1,5 +1,8 @@
 # Game board
 
+# Deferred render
+window.requestAnimFrame = window.requestAnimFrame or window.webkitRequestAnimationFrame or window.mozRequestAnimationFrame or (callback)-> callback()
+
 # Size element
 Resize = (x, y, w, h, style)->
   this.setAttribute("style", "margin-left:#{x}%;margin-top:#{y}%;width:#{w}%;height:#{h}%;" + style)
@@ -76,8 +79,9 @@ class Board
         socket.resize(row * grid_chunk - stone_size * 0.5, col * grid_chunk - stone_size * 0.5, stone_size, stone_size, "position:absolute;")
         do ()=>
           pos = @sockets.length
-          socket.onclick = (event)=>
-            @placement_event(pos)
+          socket.addEventListener "touchstart", (e)=>
+            e.preventDefault()
+            @placement_event pos
         @sockets.push(socket)
         @board_state.push(0)
 
@@ -98,23 +102,22 @@ class Board
 
   # Dump the state of the board. Positions and players
   dump_state: ()->
-    console.log "dump", @board_state.length
     return @board_state[..] # Copy to not modify original
 
   # Load up a state to the board
   load_state: (state)->
-    console.log "load", state.length, @size ** 2
     if state.length != @size ** 2
       throw "Invalid State Size"
     @board_state = state[..] # replace our state with new one
 
   # Update board to current state.
   update: (player)->
-    @grid.setAttribute("class", "grid #{@stone_class[player + 2]}")
-    for pos in [0 ... @sockets.length]
-      if @board_state[pos] != @sockets[pos].player # Check for differences in setup
-        @sockets[pos].setAttribute("class", @stone_class[@board_state[pos]])
-        @sockets[pos].player = @board_state[pos]
+    window.requestAnimFrame ()=>
+      @grid.setAttribute("class", "grid #{@stone_class[player + 2]}")
+      for pos in [0 ... @sockets.length]
+        if @board_state[pos] != @sockets[pos].player # Check for differences in setup
+          @sockets[pos].setAttribute("class", @stone_class[@board_state[pos]])
+          @sockets[pos].player = @board_state[pos]
 
   # UTILITY
 
