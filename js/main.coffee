@@ -1,6 +1,7 @@
 # Game Code
 
 # TODO: add gnugpg signing option to url for authenticity "https://openpgpjs.org/"
+# TODO: Slider size the board before any move is placed
 
 # Record the current state of the game
 class Game_Snapshot
@@ -84,7 +85,8 @@ main = ()->
   # Initialize our board and controls
   slider = new Slider(document.getElementById("slider-handle"))
   corner_gui = new Corner_GUI()
-  board = new Board(document.getElementById("board"), game_data.board_size)
+  board = new Board(document.getElementById("board"))
+  board.build game_data.board_size
 
   # Load up any moves
   for move in game_data.moves
@@ -103,12 +105,28 @@ main = ()->
     game_data.current = game_states.length + 1
     game_states.push new Game_Snapshot game_states.length % 2, state, game_data.write_id()
 
+  # Otherwise a game is in progress. Initialize our slider to moves
+  if game_states.length
+    slider.set_segment_count game_states.length
+    slider.set_pos game_states.length - 1
+  # Make slider control the board size before any move is placed.
+  else
+    slider.set_segment_count 52 - 3 # 52 max size, 3 min
+    slider.set_pos game_data.board_size - 3
+
   # Update visuals
-  URL.update href[1] # Force update to the same URL to get everything in sync
   board.update(game_states.length % 2 + 1)
   corner_gui.indicate(game_states.length % 2)
-  slider.set_segment_count game_states.length
-  slider.set_pos game_states.length - 1
+  URL.update game_data.write_id()
+
+  # Functional slider
+  slider.callback = (pos)->
+    if game_states.length # Game in progress. Change board moves
+      load_board_snapshot pos, true
+    else # Game not started. Resize board.
+      game_data.board_size = pos + 3
+      board.build pos + 3
+      URL.update game_data.write_id()
 
   # Load the board state at a certain point in time
   load_board_snapshot = (move)->
@@ -133,6 +151,7 @@ main = ()->
         game_data.add_move(pos)
         game_states.push new Game_Snapshot game_data.current % 2, current_state, game_data.write_id()
         slider.set_segment_count game_states.length # Increase slider size
+        slider.set_pos game_states.length - 1
         load_board_snapshot game_states.length - 1
       catch error
         board.load_state(current_state) # Undo
@@ -161,10 +180,6 @@ main = ()->
       new_step = game_data.current - 1 + step
       if load_board_snapshot new_step
         slider.set_pos new_step
-
-  # Update board to requested state
-  slider.callback = (pos)->
-    load_board_snapshot pos, true
 
   # Load SGF files
   dropzone = document.getElementById("dropzone") # Drop element

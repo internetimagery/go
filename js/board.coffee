@@ -13,7 +13,7 @@ Create = (name, parent)->
   return elem
 
 class Board
-  constructor: (element, @size) ->
+  constructor: (@element) ->
     @callbacks = []
     @stone_class = [
       "empty", # Completely empty
@@ -22,7 +22,9 @@ class Board
       "play-black",
       "play-white" # Empty hover pieces
     ]
-    @board_state = []
+
+  build: (@size)->
+    @element.innerHTML = "" # Clear the contents of element first
     if @size < 2
       throw "Board size not big enough."
 
@@ -32,11 +34,12 @@ class Board
     star_size = stone_size * 0.2
 
     # Create an @grid frame, smaller than the board, so our stones don't fall off the sides
-    @grid = Create("grid", element)
+    @board_state = []
+    @grid = Create("grid #{@stone_class[3]}", @element)
     inner_frame_pos = stone_size * 0.6
     inner_frame_span = 100 - inner_frame_pos * 2
     @grid.resize(inner_frame_pos, inner_frame_pos, inner_frame_span, inner_frame_span, "position:relative;")
-    element.appendChild(@grid)
+    @element.appendChild(@grid)
 
     for row in [0 ... @size]
       Create("line-horiz", @grid).setAttribute("style", "top:#{row * grid_chunk}%;")
@@ -95,10 +98,12 @@ class Board
 
   # Dump the state of the board. Positions and players
   dump_state: ()->
+    console.log "dump", @board_state.length
     return @board_state[..] # Copy to not modify original
 
   # Load up a state to the board
   load_state: (state)->
+    console.log "load", state.length, @size ** 2
     if state.length != @size ** 2
       throw "Invalid State Size"
     @board_state = state[..] # replace our state with new one
