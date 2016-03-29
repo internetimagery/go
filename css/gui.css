@@ -12,11 +12,11 @@
 
 #slider-handle {
   position: absolute;
-  height: 20px;
-  top: -7px;
+  height: 40px;
+  width: 40px;
+  top: -17px;
   background-color: #fc3c11;
-  margin-left: -10px;
-  width: 20px;
+  margin-left: -25px;
   cursor: pointer;
   border-radius: 50%;
 }

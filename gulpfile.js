@@ -36,7 +36,7 @@ gulp.task("release", function(){
 
 gulp.task("html", function(){
   gulp.src("./*.html")
-  .pipe(htmlreplace({scripts: "js/game.js", style: "css/style.css"}))
+  .pipe(htmlreplace({scripts: "js/game.min.js", style: "css/style.css"}))
   .pipe(htmlmin({
     collapseWhitespace: true,
     removeComments: true
@@ -50,13 +50,13 @@ gulp.task("js", function(){
   .pipe(coffee({bare:false}).on("error", function(err){console.log(err);}))
   .pipe(gulp.dest("./js"))
   // Combine all together
-  .pipe(concat("game.js"))
+  .pipe(concat("game.min.js"))
   // Shrink
   .pipe(uglify())
   .pipe(gulp.dest("./dist/js"))
-
+  // Pull across vendor files
   gulp.src("./js/vendor/*")
-  .pipe(gulp.dest("./dist/vendor"))
+  .pipe(gulp.dest("./dist/js/vendor"))
 });
 
 gulp.task("css", function(){
