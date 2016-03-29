@@ -115,8 +115,7 @@ main = ()->
     slider.set_pos game_data.board_size - 3
 
   # Update visuals
-  board.update(game_states.length % 2 + 1)
-  corner_gui.indicate(game_states.length % 2)
+  load_board_snapshot game_states.length - 1
   URL.update game_data.write_id()
 
   # Functional slider
